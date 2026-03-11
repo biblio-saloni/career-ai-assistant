@@ -1,0 +1,13 @@
+package com.tanisha.career_ai;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CareerAiApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CareerAiApplication.class, args);
+	}
+
+}
