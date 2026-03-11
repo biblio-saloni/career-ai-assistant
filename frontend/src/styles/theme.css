@@ -1,0 +1,125 @@
+/* theme.css */
+
+/* Header Styles */
+.header-app-bar {
+  background: linear-gradient(135deg, #020617, #0f172a) !important;
+  box-shadow: none !important;
+  padding: 8px 24px !important;
+  color: white !important;
+}
+
+.header-toolbar {
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.header-title {
+  font-weight: 700 !important;
+  cursor: pointer;
+}
+
+.header-button {
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Home Page Styles */
+.home-container {
+  background: linear-gradient(135deg, #020617, #0f172a) !important;
+  color: white !important;
+}
+
+.home-content-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 80px 120px !important;
+  gap: 24px;
+}
+
+.home-left-side {
+  flex: 1;
+}
+
+.home-right-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-title-chip {
+  color: #22d3ee !important;
+  border: 1px solid #22d3ee !important;
+  margin-bottom: 16px !important;
+}
+
+.home-title-label {
+  color: #22d3ee !important;
+}
+
+.home-main-title {
+  font-weight: 800 !important;
+  font-size: 2.5rem !important;
+  margin: 10 px 0 !important;
+}
+
+.home-button {
+    background-color: #22d3ee !important;
+}
+
+/* Info Section Styles */
+.info-container {
+  padding: 80px 120px !important;
+  background: #f8fafc !important;
+  text-align: center !important;
+}
+
+.info-title {
+  font-weight: bold !important;
+  font-size: 2rem !important;
+}
+
+.info-subtitle {
+  margin-top: 8px !important;
+  color: #64748b !important;
+}
+
+.info-steps-wrapper {
+  margin-top: 48px !important;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.info-step-card {
+  width: 250px !important;
+}
+
+.info-step-number {
+  font-size: 14px;
+  background: #14b8a6 !important;
+  color: white !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px !important;
+}
+
+.info-step-title {
+  font-weight: bold !important;
+}
+
+.info-step-description {
+  margin-top: 8px !important;
+  color: #64748b !important;
+  font-size: 14px !important;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif !important;
+}
