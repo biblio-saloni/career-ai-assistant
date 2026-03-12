@@ -1,8 +1,13 @@
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
+import type { ReactNode } from "react";
 
-export default function Header() {
+interface HeaderProps {
+  actions?: ReactNode;
+}
+
+export default function Header({ actions }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -15,14 +20,7 @@ export default function Header() {
         >
           The 6th Sense
         </Typography>
-        <Button
-          variant="outlined"
-          color="inherit"
-          className="header-button"
-          onClick={() => navigate("/upload")}
-        >
-          Get Started
-        </Button>
+        <Box>{actions}</Box>
       </Toolbar>
     </AppBar>
   );

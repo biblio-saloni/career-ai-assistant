@@ -64,7 +64,7 @@
 }
 
 .home-button {
-    background-color: #22d3ee !important;
+  background-color: #22d3ee !important;
 }
 
 /* Info Section Styles */
@@ -122,4 +122,136 @@
 body {
   margin: 0;
   font-family: "Roboto", sans-serif !important;
+}
+
+/* Upload Page */
+
+.upload-page-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-page-title {
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.upload-page-subtitle {
+  margin-top: 8px;
+  margin-bottom: 32px;
+  color: #64748b;
+}
+
+/* Upload Box */
+
+.resume-upload-box {
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  width: 650px;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  background: #f8fafc;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.resume-upload-box:hover {
+  border-color: #22d3ee;
+  background: #f1f5f9;
+  cursor: pointer;
+}
+
+.upload-icon-wrapper {
+  background: #e2e8f0;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-text-title {
+  font-weight: 600;
+}
+
+.upload-text-subtitle {
+  color: #64748b;
+}
+
+.upload-button {
+  margin-top: 8px;
+}
+
+/* Resume Upload States */
+
+.resume-upload-success-icon {
+  background: #a7f3d0;
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resume-upload-success-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.resume-upload-file {
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analyze-button {
+  margin-top: 32px;
+  padding: 14px 36px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #14b8a6, #06b6d4);
+  color: white;
+  border: none;
+}
+
+.analyze-button:hover {
+  background: linear-gradient(90deg, #0d9488, #0891b2);
+}
+
+.resume-loader-container {
+  margin-top: 40px;
+  padding: 40px;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  width: 650px;
+  text-align: center;
+}
+
+.loader-step {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loader-dot {
+  width: 10px;
+  height: 10px;
+  background: #14b8a6;
+  border-radius: 50%;
 }
