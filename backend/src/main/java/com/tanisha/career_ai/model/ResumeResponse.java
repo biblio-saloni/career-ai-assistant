@@ -1,25 +1,25 @@
 package com.tanisha.career_ai.model;
 
-import java.util.List;
+import java.util.Map;
 
 public class ResumeResponse {
 
-    private List<String> skills;
-    private List<String> recommendedRoles;
+    private Map<String, Object> analysis;
+    private String extractedText; // optional
 
-    public List<String> getSkills() {
-        return skills;
+    public Map<String, Object> getAnalysis() {
+        return analysis;
     }
 
-    public void setSkills(List<String> skills) {
-        this.skills = skills;
+    public void setAnalysis(Map<String, Object> analysis) {
+        this.analysis = analysis;
     }
 
-    public List<String> getRecommendedRoles() {
-        return recommendedRoles;
+    public String getExtractedText() {
+        return extractedText;
     }
 
-    public void setRecommendedRoles(List<String> recommendedRoles) {
-        this.recommendedRoles = recommendedRoles;
+    public void setExtractedText(String extractedText) {
+        this.extractedText = extractedText;
     }
 }

@@ -1,3 +1,6 @@
 spring:
   application:
     name: career-ai
+groq:
+  api:
+    key: ${GROQ_API_KEY}

@@ -24,16 +24,18 @@
 
 /* Home Page Styles */
 .home-container {
-  background: linear-gradient(135deg, #020617, #0f172a) !important;
-  color: white !important;
+  background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  color: white;
+  min-height: 100vh;
 }
 
 .home-content-wrapper {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 80px 120px !important;
-  gap: 24px;
+  padding: 120px 120px !important;
+  gap: 120px;
+  min-height: 100vh;
 }
 
 .home-left-side {
@@ -44,13 +46,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .home-title-chip {
   color: #22d3ee !important;
   border: 1px solid #22d3ee !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 32px !important;
 }
 
 .home-title-label {
@@ -63,10 +65,22 @@
   margin: 10 px 0 !important;
 }
 
+.home-title-accent {
+  font-weight: 800 !important;
+  font-size: 2.5rem !important;
+  margin: 10 px 0 !important;
+  color: #22d3ee !important;
+}
+
 .home-button {
   background-color: #22d3ee !important;
 }
 
+.home-card {
+  font-weight: 600 !important;
+  background-color: #22d3ee !important;
+  margin-bottom: 3 !important;
+}
 /* Info Section Styles */
 .info-container {
   padding: 80px 120px !important;

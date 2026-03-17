@@ -35,7 +35,7 @@ export default function Home() {
               label="AI-Powered Career Intelligence"
               className="home-title-chip"
             />
-            <Typography variant="h2" className="home-main-title">
+            <Typography variant="h1" className="home-main-title">
               Decode your
             </Typography>
             <Typography variant="h2" className="home-title-accent">

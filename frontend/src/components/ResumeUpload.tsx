@@ -3,35 +3,63 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Button, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function ResumeUpload() {
+  const navigate = useNavigate();
+
   const [fileName, setFileName] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  const [uploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
-  const handleFileChange = (event: any) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
 
-    setUploading(true);
-
-    setTimeout(() => {
-      setFileName(file.name);
-      setUploading(false);
+    if (selectedFile) {
+      setFile(selectedFile);
+      setFileName(selectedFile.name);
       setUploaded(true);
-    }, 2000);
+    }
   };
 
   const handleAnalyze = async () => {
+    if (!file) {
+      alert("Please select a file first");
+      return;
+    }
+
     setAnalyzing(true);
 
-    /* Later this will call your Spring Boot API */
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    setTimeout(() => {
+      const response = await fetch(
+        "http://localhost:8080/api/resume/analyze",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Analysis Result:", data);
+
+      navigate("/results", { state: { analysis: data } });
+    } catch (error) {
+      console.error("Error analyzing resume:", error);
+      alert("Failed to analyze resume. Please try again.");
+    } finally {
       setAnalyzing(false);
-      alert("Resume analysis complete (mock)");
-    }, 3000);
+    }
   };
 
   return (
@@ -51,7 +79,7 @@ export default function ResumeUpload() {
 
             <Button variant="outlined" component="label">
               Browse Files
-              <input hidden type="file" onChange={handleFileChange} />
+              <input hidden type="file" onChange={handleFileSelect} />
             </Button>
           </>
         )}
@@ -69,7 +97,9 @@ export default function ResumeUpload() {
               <CheckCircleIcon fontSize="large" />
             </div>
 
-            <div className="resume-upload-success-title">Resume uploaded!</div>
+            <div className="resume-upload-success-title">
+              Resume uploaded!
+            </div>
 
             <div className="resume-upload-file">
               <DescriptionIcon />
