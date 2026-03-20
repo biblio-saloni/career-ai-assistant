@@ -13,7 +13,7 @@ export default function Upload() {
           <>
             <Button onClick={() => navigate("/upload")}>Upload</Button>
 
-            <Button onClick={() => navigate("/dashboard")}>Dashboard</Button>
+            <Button onClick={() => navigate("/results")}>Dashboard</Button>
           </>
         }
       />

@@ -269,3 +269,199 @@ body {
   background: #14b8a6;
   border-radius: 50%;
 }
+
+/* ========================
+   CARD SYSTEM
+======================== */
+.card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.text-muted {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ========================
+   PROGRESS BAR SYSTEM
+======================== */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  animation: growBar 0.8s ease forwards;
+}
+
+/* Animation */
+@keyframes growBar {
+  from {
+    width: 0%;
+  }
+}
+
+/* COLORS */
+.progress-green { background-color: #22c55e; }
+.progress-yellow { background-color: #f59e0b; }
+.progress-red { background-color: #ef4444; }
+.progress-blue { background-color: #3b82f6; }
+
+/* WIDTH CLASSES */
+.w-60 { width: 60%; }
+.w-65 { width: 65%; }
+.w-70 { width: 70%; }
+.w-75 { width: 75%; }
+.w-80 { width: 80%; }
+.w-85 { width: 85%; }
+.w-90 { width: 90%; }
+
+/* ========================
+   TAGS / BADGES
+======================== */
+.badge {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+
+/* ========================
+   TABS
+======================== */
+.tab {
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  cursor: pointer;
+}
+
+.tab-active {
+  background: #111827;
+  color: white;
+}
+
+/* ========================
+   DASHBOARD LAYOUT
+======================== */
+.dashboard-container {
+  padding: 24px;
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dashboard-subtext {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ========================
+   TABS
+======================== */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tab-active {
+  background: #111827;
+  color: #ffffff;
+}
+
+/* ========================
+   CARD SYSTEM
+======================== */
+.card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.text-muted {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ========================
+   GRID
+======================== */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* ========================
+   BADGES
+======================== */
+.badge {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 13px;
+}
+
+.badge-green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ========================
+   LISTS
+======================== */
+.list {
+  padding-left: 18px;
+}
+
+.list li {
+  margin-bottom: 6px;
+}

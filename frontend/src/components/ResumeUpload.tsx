@@ -53,7 +53,7 @@ export default function ResumeUpload() {
 
       console.log("Analysis Result:", data);
 
-      navigate("/results", { state: { analysis: data } });
+      navigate("/results", { state: { analysis: data.analysis } });
     } catch (error) {
       console.error("Error analyzing resume:", error);
       alert("Failed to analyze resume. Please try again.");

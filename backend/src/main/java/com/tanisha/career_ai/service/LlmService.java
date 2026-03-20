@@ -35,24 +35,31 @@ public class LlmService {
                 - ALWAYS suggest improvements even if resume is good
                 - Be honest and slightly strict
 
+                IMPORTANT:
+                - skill_gaps MUST be an array of objects
+                - Each object MUST contain:
+                  - skill (string)
+                  - domain (string)
+                - DO NOT return skill_gaps as strings
+
                 Return ONLY valid JSON.
+                DO NOT include markdown or extra text.
 
                 Format:
                 {
                   "skills": [],
                   "recommended_roles": [],
                   "experience_level": "",
-                  "skill_gaps": [],
+                  "skill_gaps": [
+                    {
+                      "skill": "",
+                      "domain": ""
+                    }
+                  ],
                   "ats_score": 0,
                   "improvements": [],
                   "missing_keywords": []
                 }
-
-                Guidelines:
-                - skill_gaps = missing technical or domain skills
-                - improvements = actionable resume improvements (e.g. "Add metrics", "Use action verbs")
-                - ats_score = number between 0–100 based on ATS friendliness
-                - missing_keywords = important keywords not found in resume
 
                 Resume:
                 """ + resumeText;
@@ -64,34 +71,83 @@ public class LlmService {
         Map<String, Object> requestBody = new java.util.HashMap<>();
         requestBody.put("model", "llama-3.1-8b-instant");
         requestBody.put("messages", List.of(message));
-        requestBody.put("temperature", 0.7); // optional but helps
+        requestBody.put("temperature", 0.7);
 
         String response = webClient.post()
-                .uri("/chat/completions") // 🔥 critical fix
+                .uri("/chat/completions")
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
+                .retry(2)
                 .block();
+
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonNode root = mapper.readTree(response);
+            JsonNode root = objectMapper.readTree(response);
 
-            // Step 1: extract content string
             String content = root
-                    .get("choices")
+                    .path("choices")
                     .get(0)
-                    .get("message")
-                    .get("content")
-                    .asText();
+                    .path("message")
+                    .path("content")
+                    .asText()
+                    .trim();
 
-            // Step 2: convert that JSON string into actual JSON object
-            JsonNode actualJson = mapper.readTree(content);
+            // Remove markdown if present
+            if (content.startsWith("```")) {
+                content = content.replaceAll("```json", "")
+                        .replaceAll("```", "")
+                        .trim();
+            }
 
-            // Step 3: return clean JSON string
-            return mapper.convertValue(actualJson, new TypeReference<Map<String, Object>>() {
-            });
+            // Extract JSON only
+            int start = content.indexOf("{");
+            int end = content.lastIndexOf("}");
+
+            if (start != -1 && end != -1) {
+                content = content.substring(start, end + 1);
+            } else {
+                throw new RuntimeException("No valid JSON found: " + content);
+            }
+
+            JsonNode actualJson = objectMapper.readTree(content);
+
+            Map<String, Object> result = objectMapper.convertValue(
+                    actualJson,
+                    new TypeReference<Map<String, Object>>() {
+                    });
+
+            // 🛡️ SAFETY: fix skill_gaps if LLM returns strings
+            Object skillGapsObj = result.get("skill_gaps");
+
+            if (skillGapsObj instanceof List<?>) {
+                List<?> list = (List<?>) skillGapsObj;
+
+                if (!list.isEmpty() && list.get(0) instanceof String) {
+                    List<Map<String, String>> formatted = list.stream()
+                            .map(item -> Map.of(
+                                    "skill", item.toString(),
+                                    "domain", "General"))
+                            .toList();
+
+                    result.put("skill_gaps", formatted);
+                }
+            }
+
+            // 🛡️ SAFETY: ensure all fields exist
+            result.putIfAbsent("skills", List.of());
+            result.putIfAbsent("recommended_roles", List.of());
+            result.putIfAbsent("skill_gaps", List.of());
+            result.putIfAbsent("improvements", List.of());
+            result.putIfAbsent("missing_keywords", List.of());
+            result.putIfAbsent("ats_score", 0);
+            result.putIfAbsent("experience_level", "0");
+
+            return result;
+
         } catch (Exception e) {
+            System.out.println("RAW RESPONSE:\n" + response);
             throw new RuntimeException("Failed to parse LLM response", e);
         }
     }
