@@ -6,10 +6,15 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
+import ElectricBoltRoundedIcon from "@mui/icons-material/ElectricBoltRounded";
+import MovingOutlinedIcon from "@mui/icons-material/MovingOutlined";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Info from "../components/Info";
 import "../styles/theme.css";
+import { SocialSection } from "../components/SocialSection";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -49,6 +54,7 @@ export default function Home() {
             <Button
               variant="contained"
               className="home-button"
+              endIcon={<ArrowForwardIcon />}
               onClick={() => navigate("/upload")}
             >
               Analyse Your Resume
@@ -58,38 +64,54 @@ export default function Home() {
           <Box className="home-right-side">
             <Card className="home-card">
               <CardContent>
-                <Typography className="home-card-title">
-                  Job Match Scoring
-                </Typography>
-                <Typography className="home-card-description">
-                  See how your profile scores against real job listings
-                </Typography>
+                <div className="home-card-icon">
+                  <TrackChangesOutlinedIcon />
+                </div>
+                <div>
+                  <Typography className="home-card-title">
+                    Job Match Scoring
+                  </Typography>
+                  <Typography className="home-card-description">
+                    See how your profile scores against real job listings
+                  </Typography>
+                </div>
               </CardContent>
             </Card>
             <Card className="home-card">
               <CardContent>
-                <Typography className="home-card-title">
-                  Skill Gap Analysis
-                </Typography>
-                <Typography className="home-card-description">
-                  Identify exactly which skills you're missing
-                </Typography>
+                <div className="home-card-icon">
+                  <ElectricBoltRoundedIcon />
+                </div>
+                <div>
+                  <Typography className="home-card-title">
+                    Skill Gap Analysis
+                  </Typography>
+                  <Typography className="home-card-description">
+                    Identify exactly which skills you're missing
+                  </Typography>
+                </div>
               </CardContent>
             </Card>
             <Card className="home-card">
               <CardContent>
-                <Typography className="home-card-title">
-                  Market Demand Insights
-                </Typography>
-                <Typography className="home-card-description">
-                  Know which technologies are trending right now
-                </Typography>
+                <div className="home-card-icon">
+                  <MovingOutlinedIcon />
+                </div>
+                <div>
+                  <Typography className="home-card-title">
+                    Market Demand Insights
+                  </Typography>
+                  <Typography className="home-card-description">
+                    Know which technologies are trending right now
+                  </Typography>
+                </div>
               </CardContent>
             </Card>
           </Box>
         </Box>
       </Box>
       <Info />
+      <SocialSection />
     </>
   );
 }
