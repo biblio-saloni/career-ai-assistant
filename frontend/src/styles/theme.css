@@ -40,6 +40,7 @@
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
   text-transform: none !important;
   color: white !important;
+  padding: 6px 16px !important;
 }
 
 /* Home Page Styles */
@@ -365,7 +366,7 @@ body {
 }
 
 .resume-upload-box:hover {
-  border-color: #22d3ee;
+  border-color: #0c9488;
   background: #f1f5f9;
   cursor: pointer;
 }
@@ -395,13 +396,14 @@ body {
 /* Resume Upload States */
 
 .resume-upload-success-icon {
-  background: #a7f3d0;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #ccfbf1;
+  color: #0c9488;
 }
 
 .resume-upload-success-title {
@@ -414,6 +416,18 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.file-change-link {
+  margin-left: 8px;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.file-change-link:hover {
+  text-decoration: underline;
+  color: #0c9488;
 }
 
 .analyze-button {

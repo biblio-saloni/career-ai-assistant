@@ -1,6 +1,6 @@
 import { useState } from "react";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -37,13 +37,10 @@ export default function ResumeUpload() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(
-        "http://localhost:8080/api/resume/analyze",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://localhost:8080/api/resume/analyze", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -68,7 +65,7 @@ export default function ResumeUpload() {
         {!uploaded && !uploading && (
           <>
             <div className="upload-icon-wrapper">
-              <CloudUploadIcon fontSize="large" />
+              <FileDownloadOutlinedIcon fontSize="large" />
             </div>
 
             <div className="upload-text-title">Drop your resume here</div>
@@ -77,33 +74,51 @@ export default function ResumeUpload() {
               or click to browse · PDF or DOCX
             </div>
 
-            <Button variant="outlined" component="label">
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{
+                textTransform: "none",
+                color: "black",
+                border: "1px solid gray",
+              }}
+            >
               Browse Files
-              <input hidden type="file" onChange={handleFileSelect} />
+              <input
+                hidden
+                type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={handleFileSelect}
+              />
             </Button>
-          </>
-        )}
-
-        {uploading && (
-          <>
-            <CircularProgress />
-            <div>Uploading resume...</div>
           </>
         )}
 
         {uploaded && (
           <>
             <div className="resume-upload-success-icon">
-              <CheckCircleIcon fontSize="large" />
+              <TaskAltIcon fontSize="large" />
             </div>
 
-            <div className="resume-upload-success-title">
-              Resume uploaded!
-            </div>
+            <div className="resume-upload-success-title">Resume uploaded!</div>
 
             <div className="resume-upload-file">
               <DescriptionIcon />
               {fileName}
+              <span
+                className="file-change-link"
+                onClick={() => document.getElementById("fileInput")?.click()}
+              >
+                Change
+              </span>
+
+              <input
+                id="fileInput"
+                hidden
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileSelect}
+              />
             </div>
           </>
         )}

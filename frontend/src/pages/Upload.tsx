@@ -11,9 +11,12 @@ export default function Upload() {
       <Header
         actions={
           <>
-            <Button onClick={() => navigate("/upload")}>Upload</Button>
-
-            <Button onClick={() => navigate("/results")}>Dashboard</Button>
+            <Button
+              className="header-button"
+              onClick={() => navigate("/results")}
+            >
+              Dashboard
+            </Button>
           </>
         }
       />
