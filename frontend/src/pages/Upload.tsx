@@ -1,25 +1,11 @@
-import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import ResumeUpload from "../components/ResumeUpload";
 import Header from "../components/Header";
 
 export default function Upload() {
-  const navigate = useNavigate();
 
   return (
     <>
-      <Header
-        actions={
-          <>
-            <Button
-              className="header-button"
-              onClick={() => navigate("/results")}
-            >
-              Dashboard
-            </Button>
-          </>
-        }
-      />
+      <Header/>
       <div className="upload-page-container">
         <h1 className="upload-page-title">Upload your resume</h1>
 

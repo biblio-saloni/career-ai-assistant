@@ -43,6 +43,49 @@
   padding: 6px 16px !important;
 }
 
+/* remove default toolbar paddings */
+.MuiToolbar-root {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* make tabs take only needed space; adjust if you want centered/expanded */
+.header-tab {
+  min-width: 80px;
+  text-transform: none;
+  opacity: 0.9;
+  text-transform: none !important;
+}
+
+/* highlight selected tab */
+.header-tab.Mui-selected {
+  color: #22d3ee !important;
+  font-weight: 700;
+}
+
+/* keep actions aligned right */
+.header-actions {
+  margin-left: auto;
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px;
+  border-radius: 8px;
+}
+.header-avatar {
+  background: #22d3ee !important;
+  color: #020617 !important;
+  width: 36px;
+  height: 36px;
+}
 /* Home Page Styles */
 .home-container {
   background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);

@@ -28,7 +28,7 @@ export default function Home() {
               variant="outlined"
               color="inherit"
               className="header-button"
-              onClick={() => navigate("/upload")}
+              onClick={() => navigate("/login")}
             >
               Get Started
             </Button>

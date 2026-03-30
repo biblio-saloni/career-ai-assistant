@@ -4,3 +4,12 @@ spring:
 groq:
   api:
     key: ${GROQ_API_KEY}
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: http://localhost:8080/auth/google/callback
+  linkedin:
+    client-id: ${LINKEDIN_CLIENT_ID:}
+    client-secret: ${LINKEDIN_CLIENT_SECRET:}
+    redirect-uri: http://localhost:8080/auth/linkedin/callback
