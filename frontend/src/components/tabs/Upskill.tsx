@@ -12,9 +12,9 @@ export function Upskill({ data }: Props) {
       <div className="card">
         <h3 className="card-title">Skill Gaps</h3>
 
-        <div style={{ marginTop: "10px" }}>
+        <div className="upskill-item-list">
           {data.skill_gaps.map((gap, i) => (
-            <div key={i} style={{ marginBottom: "12px" }}>
+            <div key={i} className="upskill-item">
               <p>{gap.skill}</p>
               <p className="text-muted">{gap.domain}</p>
             </div>
@@ -26,7 +26,7 @@ export function Upskill({ data }: Props) {
       <div className="card">
         <h3 className="card-title">Resume Improvements</h3>
 
-        <ul className="list" style={{ marginTop: "10px" }}>
+        <ul className="list upskill-list">
           {data.improvements.map((imp, i) => (
             <li key={i}>{imp}</li>
           ))}

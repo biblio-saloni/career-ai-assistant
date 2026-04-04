@@ -4,6 +4,7 @@ import Upload from "./pages/Upload";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import { AuthProvider } from "./context/AuthContext";
+import AuthCallback from "./pages/AuthCallback";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/results" element={<Dashboard />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />{" "}
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -637,18 +637,147 @@ body {
 /* ========================
    DASHBOARD LAYOUT
 ======================== */
-.dashboard-container {
+.dashboard-page {
+  min-height: 100vh;
   padding: 24px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.dashboard-header {
+  margin-bottom: 18px;
 }
 
 .dashboard-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
 }
 
 .dashboard-subtext {
   color: #6b7280;
   font-size: 14px;
+  margin-top: 6px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+}
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dashboard-metrics {
+  padding: 16px;
+}
+
+.metric-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.metric-item {
+  background: #ffffff;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.metric-item strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.metric-item span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.skill-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.skill-chip {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.recommend-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recommend-item {
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 500;
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dashboard-content {
+  min-height: 520px;
+}
+
+.tab-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  font-weight: 500;
+}
+
+.tab-active {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.card.card-block {
+  padding: 16px;
+}
+
+.grid-3, .grid-2 {
+  gap: 14px;
+}
+
+.card.span-2 {
+  grid-column: span 2;
+}
+
+.no-data {
+  padding: 24px;
+  text-align: center;
 }
 
 /* ========================
@@ -732,8 +861,30 @@ body {
 ======================== */
 .list {
   padding-left: 18px;
+  margin-top: 10px;
 }
 
 .list li {
   margin-bottom: 6px;
+}
+
+.section-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.upskill-item-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upskill-item {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
 }

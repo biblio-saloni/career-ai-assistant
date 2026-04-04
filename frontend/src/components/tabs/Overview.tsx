@@ -25,10 +25,10 @@ export function Overview({ data }: Props) {
       </div>
 
       {/* Skills Section */}
-      <div className="card" style={{ gridColumn: "span 2" }}>
+      <div className="card span-2">
         <h3 className="card-title">Skills</h3>
 
-        <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        <div className="skill-chip-grid">
           {data.skills.map((skill, i) => (
             <span key={i} className="badge badge-green">
               {skill}
@@ -41,7 +41,7 @@ export function Overview({ data }: Props) {
       <div className="card">
         <h3 className="card-title">Recommended Roles</h3>
 
-        <div style={{ marginTop: "10px" }}>
+        <div className="section-list">
           {data.recommended_roles.map((role, i) => (
             <p key={i}>{role}</p>
           ))}
