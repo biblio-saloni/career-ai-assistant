@@ -15,25 +15,24 @@ import Header from "../components/Header";
 import Info from "../components/Info";
 import "../styles/theme.css";
 import { SocialSection } from "../components/SocialSection";
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleAnalyse = () => {
+    if (!user) {
+      navigate("/login");
+    } else {
+      navigate("/upload");
+    }
+  };
 
   return (
     <>
       <Box className="home-container">
-        <Header
-          actions={
-            <Button
-              variant="outlined"
-              color="inherit"
-              className="header-button"
-              onClick={() => navigate("/login")}
-            >
-              Get Started
-            </Button>
-          }
-        />
+        <Header />
         <Box className="home-content-wrapper">
           <Box className="home-left-side">
             <Chip
@@ -55,7 +54,7 @@ export default function Home() {
               variant="contained"
               className="home-button"
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate("/upload")}
+              onClick={handleAnalyse}
             >
               Analyse Your Resume
             </Button>

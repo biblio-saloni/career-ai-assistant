@@ -48,7 +48,6 @@ export default function Header({ actions }: HeaderProps) {
           </Typography>
         </Box>
 
-        {/* This Box pushes Tabs (and actions) to the right */}
         <Box
           sx={{
             marginLeft: "auto",
@@ -64,9 +63,16 @@ export default function Header({ actions }: HeaderProps) {
             className="header-tabs"
             aria-label="main navigation"
           >
+            {/* Home is always visible */}
             <Tab label="Home" value="home" className="header-tab" />
-            <Tab label="Upload" value="upload" className="header-tab" />
-            <Tab label="Dashboard" value="dashboard" className="header-tab" />
+
+            {/* Upload and Dashboard only for signed-in users */}
+            {user && (
+              <Tab label="Upload" value="upload" className="header-tab" />
+            )}
+            {user && (
+              <Tab label="Dashboard" value="dashboard" className="header-tab" />
+            )}
           </Tabs>
 
           <Box
@@ -79,7 +85,7 @@ export default function Header({ actions }: HeaderProps) {
             className="header-actions"
           >
             {!user ? (
-              actions ?? (
+              (actions ?? (
                 <Button
                   variant="outlined"
                   color="inherit"
@@ -88,10 +94,10 @@ export default function Header({ actions }: HeaderProps) {
                 >
                   Get Started
                 </Button>
-              )
+              ))
             ) : (
               <>
-                <Avatar className="header-avatar" sx={{ order: 0 }}>
+                <Avatar className="header-avatar">
                   {user.name?.charAt(0).toUpperCase()}
                 </Avatar>
                 <Button
@@ -99,7 +105,6 @@ export default function Header({ actions }: HeaderProps) {
                   color="inherit"
                   className="header-button"
                   onClick={() => signOut()}
-                  sx={{ order: 1 }}
                 >
                   Sign Out
                 </Button>
