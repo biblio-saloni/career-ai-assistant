@@ -63,9 +63,9 @@ export default function Header({ actions }: HeaderProps) {
             className="header-tabs"
             aria-label="main navigation"
           >
-            {/* Home is always visible */}
-            <Tab label="Home" value="home" className="header-tab" />
-
+            {user && (
+              <Tab label="Home" value="home" className="header-tab" />
+            )}
             {/* Upload and Dashboard only for signed-in users */}
             {user && (
               <Tab label="Upload" value="upload" className="header-tab" />
