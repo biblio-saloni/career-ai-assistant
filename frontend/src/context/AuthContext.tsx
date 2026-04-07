@@ -12,7 +12,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
 
   const mapUser = (u: any): User => ({
@@ -32,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event: any, session: any) => {
         setUser(session?.user ? mapUser(session.user) : null);
-      }
+      },
     );
 
     return () => {
@@ -43,12 +45,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithProvider = async (provider: "google" | "linkedin") => {
     if (!supabase) throw new Error("Supabase not configured");
 
-    if (provider === "linkedin") {
-      throw new Error("LinkedIn login is not currently available via Supabase.");
-    }
+    const providerMap = {
+      google: "google",
+      linkedin: "linkedin_oidc",
+    } as const;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: providerMap[provider],
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -63,9 +66,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithEmail = async (email: string, password: string) => {
     if (!supabase) throw new Error("Supabase not configured");
-    if (!email || !password) throw new Error("Please provide email and password");
+    if (!email || !password)
+      throw new Error("Please provide email and password");
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) throw error;
     if (!data.session?.user) throw new Error("Could not sign in, try again");
 
@@ -80,7 +87,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, signInWithProvider, signInWithEmail, signOut }}>
+    <AuthContext.Provider
+      value={{ user, signInWithProvider, signInWithEmail, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
