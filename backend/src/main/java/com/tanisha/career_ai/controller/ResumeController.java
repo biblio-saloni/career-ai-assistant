@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/resume")
-
 public class ResumeController {
+
     private final ResumeService resumeService;
 
     public ResumeController(ResumeService resumeService) {
@@ -18,10 +18,11 @@ public class ResumeController {
 
     @PostMapping("/analyze")
     public ResponseEntity<ResumeResponse> analyzeResume(
-            @RequestParam("file") MultipartFile file) throws Exception {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("userId") String userId,
+            @RequestParam("fileName") String fileName) throws Exception {
 
-        ResumeResponse response = resumeService.analyze(file);
-
+        ResumeResponse response = resumeService.analyze(file, userId, fileName);
         return ResponseEntity.ok(response);
     }
 }

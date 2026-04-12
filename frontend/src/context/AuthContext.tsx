@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-export type User = { name: string; email?: string };
+export type User = { id: string; name: string; email?: string };
 
 type AuthContextType = {
   user: User | null;
@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
 
   const mapUser = (u: any): User => ({
+    id: u.id,
     name: u.user_metadata?.full_name || u.email?.split("@")[0] || "User",
     email: u.email || undefined,
   });

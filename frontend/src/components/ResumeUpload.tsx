@@ -4,56 +4,72 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function ResumeUpload() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState<File | null>(null);
-
-  const [uploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-
     if (selectedFile) {
       setFile(selectedFile);
       setFileName(selectedFile.name);
       setUploaded(true);
+      setError(null);
     }
   };
 
   const handleAnalyze = async () => {
     if (!file) {
-      alert("Please select a file first");
+      setError("Please select a file first.");
+      return;
+    }
+
+    if (!user?.id) {
+      setError("You must be logged in to analyze a resume.");
       return;
     }
 
     setAnalyzing(true);
+    setError(null);
 
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("userId", user.id);
+      formData.append("fileName", file.name);
 
-      const response = await fetch("http://localhost:8080/api/resume/analyze", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+      const response = await fetch(`${apiUrl}/api/resume/analyze`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const text = await response.text();
+        throw new Error(`Server error ${response.status}: ${text}`);
       }
 
       const data = await response.json();
-
-      console.log("Analysis Result:", data);
-
       navigate("/results", { state: { analysis: data.analysis } });
-    } catch (error) {
-      console.error("Error analyzing resume:", error);
-      alert("Failed to analyze resume. Please try again.");
+    } catch (err: any) {
+      console.error("Error analyzing resume:", err);
+
+      if (err.message?.includes("Failed to fetch")) {
+        setError(
+          "Cannot reach the server. Make sure your backend is running on port 8080.",
+        );
+      } else {
+        setError(err.message || "Failed to analyze resume. Please try again.");
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -62,18 +78,15 @@ export default function ResumeUpload() {
   return (
     <>
       <div className="resume-upload-box">
-        {!uploaded && !uploading && (
+        {!uploaded && (
           <>
             <div className="upload-icon-wrapper">
               <FileDownloadOutlinedIcon fontSize="large" />
             </div>
-
             <div className="upload-text-title">Drop your resume here</div>
-
             <div className="upload-text-subtitle">
               or click to browse · PDF or DOCX
             </div>
-
             <Button
               variant="outlined"
               component="label"
@@ -99,9 +112,7 @@ export default function ResumeUpload() {
             <div className="resume-upload-success-icon">
               <TaskAltIcon fontSize="large" />
             </div>
-
             <div className="resume-upload-success-title">Resume uploaded!</div>
-
             <div className="resume-upload-file">
               <DescriptionIcon />
               {fileName}
@@ -111,7 +122,6 @@ export default function ResumeUpload() {
               >
                 Change
               </span>
-
               <input
                 id="fileInput"
                 hidden
@@ -124,6 +134,24 @@ export default function ResumeUpload() {
         )}
       </div>
 
+      {/* Error message */}
+      {error && (
+        <p
+          style={{
+            color: "#f87171",
+            textAlign: "center",
+            marginTop: "12px",
+            fontSize: "0.9rem",
+            background: "rgba(248,113,113,0.08)",
+            border: "1px solid rgba(248,113,113,0.2)",
+            borderRadius: "8px",
+            padding: "10px 16px",
+          }}
+        >
+          {error}
+        </p>
+      )}
+
       {uploaded && !analyzing && (
         <button className="analyze-button" onClick={handleAnalyze}>
           Analyze My Resume →
@@ -133,21 +161,16 @@ export default function ResumeUpload() {
       {analyzing && (
         <div className="resume-loader-container">
           <CircularProgress />
-
           <h3>Analyzing your resume...</h3>
-
           <p>Extracting skills, finding jobs, and building your roadmap.</p>
-
           <div className="loader-step">
             <div className="loader-dot" />
             Parsing resume & extracting skills
           </div>
-
           <div className="loader-step">
             <div className="loader-dot" />
             Searching job market for matches
           </div>
-
           <div className="loader-step">
             <div className="loader-dot" />
             Building upskill recommendations

@@ -31,3 +31,22 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# secrets
+.env
+application-local.yaml
+
+# build
+target/
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+run-local.sh
