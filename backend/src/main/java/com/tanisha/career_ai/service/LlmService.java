@@ -162,4 +162,75 @@ public class LlmService {
             throw new RuntimeException("Failed to parse LLM response", e);
         }
     }
+
+    public String improveResume(String resumeText, java.util.List<String> improvements,
+            java.util.List<String> missingKeywords, java.util.List<String> skills,
+            String experienceLevel) {
+
+        String improvementsList = String.join("\n- ", improvements);
+        String keywordsList = String.join(", ", missingKeywords);
+        String skillsList = String.join(", ", skills);
+
+        String prompt = """
+                You are an expert resume writer and ATS optimization specialist.
+
+                Your task is to rewrite the resume below applying ONLY the listed improvements.
+
+                STRICT RULES:
+                - Keep ALL existing experience, education, skills, and facts — do NOT remove anything
+                - Do NOT invent new jobs, degrees, or experiences that are not in the original
+                - Add the missing keywords naturally into existing bullet points where they genuinely fit
+                - Quantify achievements where numbers are missing but keep them realistic based on context
+                - Add a professional summary at the top if one is missing
+                - Improve bullet point phrasing to be more impactful and action-verb led
+                - Do NOT change job titles, company names, dates, or education details
+                - Every change must improve ATS score — do not remove existing keywords
+
+                IMPROVEMENTS TO APPLY:
+                - """ + improvementsList + """
+
+                MISSING KEYWORDS TO INCORPORATE (where they naturally fit):
+                """ + keywordsList + """
+
+                EXISTING SKILLS (do not remove these):
+                """ + skillsList + """
+
+                Return the improved resume as clean plain text, properly structured with sections:
+                CONTACT INFO
+                PROFESSIONAL SUMMARY
+                SKILLS
+                EXPERIENCE
+                EDUCATION
+
+                Do not add any explanation or commentary — return ONLY the resume text.
+
+                ORIGINAL RESUME:
+                """ + resumeText;
+
+        Map<String, Object> message = new java.util.HashMap<>();
+        message.put("role", "user");
+        message.put("content", prompt);
+
+        Map<String, Object> requestBody = new java.util.HashMap<>();
+        requestBody.put("model", "llama-3.3-70b-versatile");
+        requestBody.put("messages", java.util.List.of(message));
+        requestBody.put("temperature", 0.3);
+        requestBody.put("max_tokens", 4000);
+
+        String response = webClient.post()
+                .uri("/chat/completions")
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .retry(2)
+                .block();
+
+        try {
+            JsonNode root = objectMapper.readTree(response);
+            return root.path("choices").get(0)
+                    .path("message").path("content").asText().trim();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse LLM improve response", e);
+        }
+    }
 }

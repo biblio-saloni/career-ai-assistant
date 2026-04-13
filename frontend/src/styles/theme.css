@@ -1225,3 +1225,71 @@ body {
   border-radius: 10px;
   background: #f8fafc;
 }
+
+.improve-btn {
+  background: linear-gradient(135deg, #22d3ee, #107a8b);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.improve-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+}
+
+.improve-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.improve-btn--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.improvement-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.improvement-number {
+  min-width: 24px;
+  height: 24px;
+  background: rgba(34, 211, 238, 0.15);
+  color: #22d3ee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.improved-resume-box {
+  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.improved-resume-text {
+  white-space: pre-wrap;
+  font-family: "Courier New", monospace;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  max-height: 500px;
+  overflow-y: auto;
+  margin: 0;
+}

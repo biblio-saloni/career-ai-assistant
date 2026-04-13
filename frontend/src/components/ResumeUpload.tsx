@@ -59,10 +59,10 @@ export default function ResumeUpload() {
       }
 
       const data = await response.json();
-      navigate("/results", { state: { analysis: data.analysis } });
+      navigate("/results", {
+        state: { analysis: data.analysis, extractedText: data.extractedText },
+      });
     } catch (err: any) {
-      console.error("Error analyzing resume:", err);
-
       if (err.message?.includes("Failed to fetch")) {
         setError(
           "Cannot reach the server. Make sure your backend is running on port 8080.",

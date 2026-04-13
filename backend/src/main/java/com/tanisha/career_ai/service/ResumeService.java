@@ -1,6 +1,7 @@
 package com.tanisha.career_ai.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tanisha.career_ai.model.ResumeImproveRequest;
 import com.tanisha.career_ai.model.ResumeResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,18 +37,16 @@ public class ResumeService {
 
     public ResumeResponse analyze(MultipartFile file, String userId, String fileName) throws Exception {
         String resumeText = tika.parseToString(file.getInputStream());
-
         Map<String, Object> analysisResult = llmService.analyzeResume(resumeText);
-
-        // Save to Supabase
-        saveToSupabase(userId, fileName, analysisResult);
+        saveToSupabase(userId, fileName, analysisResult, resumeText); // ← pass resumeText
 
         ResumeResponse response = new ResumeResponse();
         response.setAnalysis(analysisResult);
+        response.setExtractedText(resumeText);
         return response;
     }
 
-    private void saveToSupabase(String userId, String fileName, Map<String, Object> analysis) {
+    private void saveToSupabase(String userId, String fileName, Map<String, Object> analysis, String resumeText) {
         try {
             Map<String, Object> row = new HashMap<>();
             row.put("user_id", userId);
@@ -59,19 +58,26 @@ public class ResumeService {
             row.put("ats_score", analysis.get("ats_score"));
             row.put("improvements", analysis.get("improvements"));
             row.put("missing_keywords", analysis.get("missing_keywords"));
+            row.put("extracted_text", resumeText); // ← add this
 
             String body = objectMapper.writeValueAsString(row);
-
             supabaseClient.post()
                     .uri("/rest/v1/resume_scans")
                     .bodyValue(body)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-
         } catch (Exception e) {
-            // Don't fail the whole request if save fails — just log
             System.err.println("Failed to save scan to Supabase: " + e.getMessage());
         }
+    }
+
+    public String improveResume(ResumeImproveRequest request) {
+        return llmService.improveResume(
+                request.getResumeText(),
+                request.getImprovements(),
+                request.getMissingKeywords(),
+                request.getSkills(),
+                request.getExperienceLevel());
     }
 }

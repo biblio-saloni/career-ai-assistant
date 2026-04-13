@@ -49,7 +49,8 @@ export default function Dashboard() {
   const location = useLocation();
   const navData = location.state?.analysis as Analysis | undefined;
   const navFileName = location.state?.fileName as string | undefined;
-
+  const navExtractedText = location.state?.extractedText as string | undefined;
+  const [extractedText] = useState<string>(navExtractedText ?? "");
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [selectedScan, setSelectedScan] = useState<ScanRecord | null>(null);
@@ -224,7 +225,9 @@ export default function Dashboard() {
                     {activeTab === "overview" && <Overview data={data} />}
                     {activeTab === "jobs" && <Jobs data={data} />}
                     {activeTab === "skills" && <SkillGaps data={data} />}
-                    {activeTab === "upskill" && <Upskill data={data} />}
+                    {activeTab === "upskill" && (
+                      <Upskill data={data} extractedText={extractedText} />
+                    )}
                     {activeTab === "market" && <Market data={data} />}
                   </div>
                 </main>
