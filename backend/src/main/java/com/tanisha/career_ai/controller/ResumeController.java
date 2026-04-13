@@ -4,7 +4,7 @@ import com.tanisha.career_ai.model.ResumeResponse;
 import com.tanisha.career_ai.model.ResumeImproveRequest;
 import com.tanisha.career_ai.service.ResumeService;
 
-import java.util.Map;
+// import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,14 +31,16 @@ public class ResumeController {
     }
 
     @PostMapping("/improve")
-    public ResponseEntity<Map<String, String>> improveResume(
+    public ResponseEntity<byte[]> improveResume(
             @RequestBody ResumeImproveRequest request) {
         try {
-            String improvedText = resumeService.improveResume(request);
-            return ResponseEntity.ok(java.util.Map.of("improvedText", improvedText));
+            byte[] pdfBytes = resumeService.improveAndGeneratePdf(request);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=\"improved_resume.pdf\"")
+                    .body(pdfBytes);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

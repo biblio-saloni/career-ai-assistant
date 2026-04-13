@@ -1275,21 +1275,24 @@ body {
   font-weight: 600;
 }
 
-.improved-resume-box {
-  margin-top: 20px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  border-radius: 8px;
-  padding: 16px;
-}
-
 .improved-resume-text {
   white-space: pre-wrap;
   font-family: "Courier New", monospace;
   font-size: 0.82rem;
-  color: #cbd5e1;
+  color: #0f172a;
+  background: #f8fafc;
   line-height: 1.6;
   max-height: 500px;
   overflow-y: auto;
   margin: 0;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+improved-resume-box {
+  margin-top: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
 }
