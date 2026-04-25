@@ -1,13 +1,12 @@
 spring:
   application:
     name: career-ai
-server:
-  port: ${PORT:8080}
-spring:
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+server:
+  port: ${PORT:8080}
 groq:
   api:
     key: ${GROQ_API_KEY}
