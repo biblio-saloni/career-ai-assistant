@@ -21,13 +21,17 @@ public class ResumeController {
     }
 
     @PostMapping("/analyze")
-    public ResponseEntity<ResumeResponse> analyzeResume(
+    public ResponseEntity<?> analyzeResume(
             @RequestParam("file") MultipartFile file,
             @RequestParam("userId") String userId,
-            @RequestParam("fileName") String fileName) throws Exception {
-
-        ResumeResponse response = resumeService.analyze(file, userId, fileName);
-        return ResponseEntity.ok(response);
+            @RequestParam("fileName") String fileName) {
+        try {
+            ResumeResponse response = resumeService.analyze(file, userId, fileName);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error during analysis: " + e.getMessage());
+        }
     }
 
     @PostMapping("/improve")

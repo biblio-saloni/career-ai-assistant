@@ -23,7 +23,7 @@ export function Upskill({ data, extractedText, originalFile }: Props) {
     setError(null);
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
       const formData = new FormData();
       formData.append("file", originalFile);
