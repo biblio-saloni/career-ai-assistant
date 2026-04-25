@@ -97,10 +97,8 @@ public class ResumeService {
     private byte[] generatePdf(String text) throws Exception {
         try (org.apache.pdfbox.pdmodel.PDDocument document = new org.apache.pdfbox.pdmodel.PDDocument()) {
 
-            org.apache.pdfbox.pdmodel.font.PDFont regularFont = new org.apache.pdfbox.pdmodel.font.PDType1Font(
-                    org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA);
-            org.apache.pdfbox.pdmodel.font.PDFont boldFont = new org.apache.pdfbox.pdmodel.font.PDType1Font(
-                    org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA_BOLD);
+            org.apache.pdfbox.pdmodel.font.PDFont regularFont = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
+            org.apache.pdfbox.pdmodel.font.PDFont boldFont = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
             float margin = 50;
             float pageWidth = org.apache.pdfbox.pdmodel.common.PDRectangle.A4.getWidth();
@@ -237,8 +235,8 @@ public class ResumeService {
     private byte[] modifyPdfWithImprovedText(byte[] originalPdfBytes, String originalText, String improvedText) throws Exception {
         byte[] improvementsPdfBytes = generatePdf("--- AI SUGGESTED IMPROVEMENTS ---\n\n" + improvedText);
 
-        try (org.apache.pdfbox.pdmodel.PDDocument originalDoc = org.apache.pdfbox.Loader.loadPDF(originalPdfBytes);
-             org.apache.pdfbox.pdmodel.PDDocument improvementsDoc = org.apache.pdfbox.Loader.loadPDF(improvementsPdfBytes)) {
+        try (org.apache.pdfbox.pdmodel.PDDocument originalDoc = org.apache.pdfbox.pdmodel.PDDocument.load(originalPdfBytes);
+             org.apache.pdfbox.pdmodel.PDDocument improvementsDoc = org.apache.pdfbox.pdmodel.PDDocument.load(improvementsPdfBytes)) {
             
             org.apache.pdfbox.multipdf.PDFMergerUtility merger = new org.apache.pdfbox.multipdf.PDFMergerUtility();
             
