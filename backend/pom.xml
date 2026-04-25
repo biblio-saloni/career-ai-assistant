@@ -72,6 +72,7 @@
     <artifactId>pdfbox</artifactId>
     <version>3.0.1</version>
 </dependency>
+<!-- Removed itext7-core because we use pdfbox -->
 <!-- XML -->
 <dependency>
   <groupId>io.netty</groupId>

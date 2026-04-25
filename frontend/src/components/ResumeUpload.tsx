@@ -46,7 +46,7 @@ export default function ResumeUpload() {
       formData.append("userId", user.id);
       formData.append("fileName", file.name);
 
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const apiUrl = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
       const response = await fetch(`${apiUrl}/api/resume/analyze`, {
         method: "POST",

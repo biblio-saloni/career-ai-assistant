@@ -220,4 +220,34 @@ public class ResumeService {
             lines.add(current.toString());
         return lines;
     }
+
+    public byte[] improveAndModifyOriginalPdf(ResumeImproveRequest request, byte[] originalPdfBytes) throws Exception {
+        // Get improved text from LLM
+        String improvedText = llmService.improveResume(
+                request.getResumeText(),
+                request.getImprovements(),
+                request.getMissingKeywords(),
+                request.getSkills(),
+                request.getExperienceLevel());
+
+        // Modify original PDF with improved text
+        return modifyPdfWithImprovedText(originalPdfBytes, request.getResumeText(), improvedText);
+    }
+
+    private byte[] modifyPdfWithImprovedText(byte[] originalPdfBytes, String originalText, String improvedText) throws Exception {
+        byte[] improvementsPdfBytes = generatePdf("--- AI SUGGESTED IMPROVEMENTS ---\n\n" + improvedText);
+
+        try (org.apache.pdfbox.pdmodel.PDDocument originalDoc = org.apache.pdfbox.Loader.loadPDF(originalPdfBytes);
+             org.apache.pdfbox.pdmodel.PDDocument improvementsDoc = org.apache.pdfbox.Loader.loadPDF(improvementsPdfBytes)) {
+            
+            org.apache.pdfbox.multipdf.PDFMergerUtility merger = new org.apache.pdfbox.multipdf.PDFMergerUtility();
+            
+            // Append original resume to the improvements document
+            merger.appendDocument(improvementsDoc, originalDoc);
+            
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            improvementsDoc.save(baos);
+            return baos.toByteArray();
+        }
+    }
 }

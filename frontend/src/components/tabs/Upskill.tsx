@@ -4,60 +4,57 @@ import type { Analysis } from "../../pages/Dashboard";
 interface Props {
   data: Analysis;
   extractedText?: string;
+  originalFile?: File;
 }
 
-export function Upskill({ data, extractedText }: Props) {
+export function Upskill({ data, extractedText, originalFile }: Props) {
   const [improving, setImproving] = useState(false);
   const [improvedText, setImprovedText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleImprove = async () => {
-    console.log("Button clicked");
-  console.log("extractedText:", extractedText);
-  console.log("data.improvements:", data.improvements);
-    if (!extractedText) {
-      setError(
-        "Original resume text not available. Please re-upload your resume.",
-      );
+  const handleDownloadImprovedResume = async () => {
+    if (!extractedText || !originalFile) {
+      setError("Original resume file not available.");
       return;
     }
 
     setImproving(true);
+    setImprovedText(null);
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-      const response = await fetch(`${apiUrl}/api/resume/improve`, {
+      const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+
+      const formData = new FormData();
+      formData.append("file", originalFile);
+      formData.append("resumeText", extractedText);
+      formData.append("improvements", JSON.stringify(data.improvements || []));
+      formData.append("missingKeywords", JSON.stringify(data.missing_keywords || []));
+      formData.append("skills", JSON.stringify(data.skills || []));
+      formData.append("experienceLevel", data.experience_level || "Mid-Level");
+
+      const response = await fetch(`${apiBase}/api/resume/improve`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          resumeText: extractedText,
-          improvements: data.improvements,
-          missingKeywords: data.missing_keywords,
-          skills: data.skills,
-          experienceLevel: data.experience_level,
-        }),
+        body: formData,
       });
 
       if (!response.ok) throw new Error(`Server error ${response.status}`);
-      const result = await response.json();
-      setImprovedText(result.improvedText);
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `improved-resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setImprovedText("downloaded");
     } catch (err: any) {
-      setError(err.message || "Failed to improve resume.");
+      setError(err.message || "Failed to download improved resume.");
     } finally {
       setImproving(false);
     }
-  };
-
-  const handleDownload = () => {
-    if (!improvedText) return;
-    const blob = new Blob([improvedText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "improved_resume.txt";
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -117,11 +114,13 @@ export function Upskill({ data, extractedText }: Props) {
               Apply these to boost your ATS score
             </p>
           </div>
-          {!improvedText && !improving && (
-            <button className="improve-btn" onClick={handleImprove}>
-              ✨ Generate Improved Resume
-            </button>
-          )}
+          <button
+            className="improve-btn"
+            onClick={handleDownloadImprovedResume}
+            disabled={improving}
+          >
+            {improving ? "Generating..." : "📥 Download Improved Resume"}
+          </button>
         </div>
 
         {/* Improvements list */}
@@ -171,25 +170,23 @@ export function Upskill({ data, extractedText }: Props) {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "12px",
               }}
             >
-              <h4 style={{ margin: 0, color: "#22d3ee" }}>
-                ✅ Improved Resume Ready
+              <h4 style={{ margin: 0, color: "#16a34a" }}>
+                {improvedText.includes("downloaded")
+                  ? "✅ PDF Downloaded!"
+                  : "✅ Improved Resume Ready"}
               </h4>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button className="improve-btn" onClick={handleDownload}>
-                  ⬇ Download .txt
-                </button>
-                <button
-                  className="improve-btn improve-btn--secondary"
-                  onClick={() => setImprovedText(null)}
-                >
-                  Regenerate
-                </button>
-              </div>
+              <button
+                className="improve-btn improve-btn--secondary"
+                onClick={() => setImprovedText(null)}
+              >
+                Regenerate
+              </button>
             </div>
-            <pre className="improved-resume-text">{improvedText}</pre>
+            {!improvedText.includes("downloaded") && (
+              <pre className="improved-resume-text">{improvedText}</pre>
+            )}
           </div>
         )}
       </div>
