@@ -35,8 +35,7 @@ public class ResumeController {
     }
 
     @PostMapping("/improve")
-    public ResponseEntity<byte[]> improveResume(
-            @RequestParam("file") MultipartFile originalPdfFile,
+    public ResponseEntity<?> improveResume(
             @RequestParam("resumeText") String resumeText,
             @RequestParam("improvements") String improvementsJson,
             @RequestParam("missingKeywords") String missingKeywordsJson,
@@ -51,16 +50,11 @@ public class ResumeController {
             request.setSkills(mapper.readValue(skillsJson, new com.fasterxml.jackson.core.type.TypeReference<java.util.List<String>>(){}));
             request.setExperienceLevel(experienceLevel);
 
-            byte[] pdfBytes = resumeService.improveAndModifyOriginalPdf(
-                    request,
-                    originalPdfFile.getBytes());
-            return ResponseEntity.ok()
-                    .header("Content-Type", "application/pdf")
-                    .header("Content-Disposition", "attachment; filename=\"improved_resume.pdf\"")
-                    .body(pdfBytes);
+            String improvedText = resumeService.improveResume(request);
+            return ResponseEntity.ok(java.util.Map.of("improvedText", improvedText));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Error during improvement: " + e.getMessage());
         }
     }
 }

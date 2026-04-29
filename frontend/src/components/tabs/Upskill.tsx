@@ -7,14 +7,15 @@ interface Props {
   originalFile?: File;
 }
 
-export function Upskill({ data, extractedText, originalFile }: Props) {
+export function Upskill({ data, extractedText }: Props) {
   const [improving, setImproving] = useState(false);
   const [improvedText, setImprovedText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const handleDownloadImprovedResume = async () => {
-    if (!extractedText || !originalFile) {
-      setError("Original resume file not available.");
+  const handleGenerateImprovedResume = async () => {
+    if (!extractedText) {
+      setError("Original resume text not available. Please re-upload your resume.");
       return;
     }
 
@@ -26,7 +27,6 @@ export function Upskill({ data, extractedText, originalFile }: Props) {
       const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
       const formData = new FormData();
-      formData.append("file", originalFile);
       formData.append("resumeText", extractedText);
       formData.append("improvements", JSON.stringify(data.improvements || []));
       formData.append("missingKeywords", JSON.stringify(data.missing_keywords || []));
@@ -38,23 +38,25 @@ export function Upskill({ data, extractedText, originalFile }: Props) {
         body: formData,
       });
 
-      if (!response.ok) throw new Error(`Server error ${response.status}`);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errText}`);
+      }
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `improved-resume.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      setImprovedText("downloaded");
+      const json = await response.json();
+      setImprovedText(json.improvedText);
     } catch (err: any) {
-      setError(err.message || "Failed to download improved resume.");
+      setError(err.message || "Failed to generate improved resume.");
     } finally {
       setImproving(false);
     }
+  };
+
+  const handleCopy = async () => {
+    if (!improvedText) return;
+    await navigator.clipboard.writeText(improvedText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -114,13 +116,15 @@ export function Upskill({ data, extractedText, originalFile }: Props) {
               Apply these to boost your ATS score
             </p>
           </div>
-          <button
-            className="improve-btn"
-            onClick={handleDownloadImprovedResume}
-            disabled={improving}
-          >
-            {improving ? "Generating..." : "📥 Download Improved Resume"}
-          </button>
+          {!improvedText && (
+            <button
+              className="improve-btn"
+              onClick={handleGenerateImprovedResume}
+              disabled={improving}
+            >
+              {improving ? "Generating..." : "✨ Generate Improved Resume"}
+            </button>
+          )}
         </div>
 
         {/* Improvements list */}
@@ -153,43 +157,98 @@ export function Upskill({ data, extractedText, originalFile }: Props) {
         {/* Loading state */}
         {improving && (
           <div
-            style={{ textAlign: "center", padding: "24px", color: "#6b7280" }}
+            style={{ textAlign: "center", padding: "32px", color: "#6b7280" }}
           >
-            <p style={{ fontWeight: 500 }}>Rewriting your resume with AI...</p>
-            <p style={{ fontSize: "0.82rem" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "8px" }}>⏳</div>
+            <p style={{ fontWeight: 600, margin: "0 0 4px" }}>
+              AI is rewriting your resume...
+            </p>
+            <p style={{ fontSize: "0.82rem", margin: 0 }}>
               This takes about 15–20 seconds
             </p>
           </div>
         )}
+      </div>
 
-        {/* Result */}
-        {improvedText && (
-          <div className="improved-resume-box">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <h4 style={{ margin: 0, color: "#16a34a" }}>
-                {improvedText.includes("downloaded")
-                  ? "✅ PDF Downloaded!"
-                  : "✅ Improved Resume Ready"}
-              </h4>
+      {/* Improved Resume Result */}
+      {improvedText && (
+        <div className="card" style={{ borderColor: "#22c55e33" }}>
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+              paddingBottom: "12px",
+              borderBottom: "1px solid #e5e7eb",
+            }}
+          >
+            <div>
+              <h3
+                style={{
+                  margin: 0,
+                  color: "#16a34a",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                ✅ Improved Resume Ready
+              </h3>
+              <p
+                className="text-muted"
+                style={{ fontSize: "0.82rem", margin: "4px 0 0" }}
+              >
+                Copy and paste this into your resume editor (Word, Google Docs, etc.)
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
               <button
                 className="improve-btn improve-btn--secondary"
-                onClick={() => setImprovedText(null)}
+                onClick={handleCopy}
+                style={{
+                  background: copied ? "#dcfce7" : undefined,
+                  borderColor: copied ? "#16a34a" : undefined,
+                  color: copied ? "#16a34a" : undefined,
+                }}
               >
-                Regenerate
+                {copied ? "✅ Copied!" : "📋 Copy Text"}
+              </button>
+              <button
+                className="improve-btn improve-btn--secondary"
+                onClick={() => {
+                  setImprovedText(null);
+                  setError(null);
+                }}
+              >
+                🔄 Regenerate
               </button>
             </div>
-            {!improvedText.includes("downloaded") && (
-              <pre className="improved-resume-text">{improvedText}</pre>
-            )}
           </div>
-        )}
-      </div>
+
+          {/* Resume text content */}
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              fontFamily: "'Georgia', serif",
+              fontSize: "0.88rem",
+              lineHeight: "1.7",
+              color: "#1f2937",
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              padding: "20px 24px",
+              margin: 0,
+              maxHeight: "600px",
+              overflowY: "auto",
+            }}
+          >
+            {improvedText}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }
