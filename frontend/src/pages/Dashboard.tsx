@@ -78,6 +78,12 @@ export default function Dashboard() {
       });
   }, []);
 
+  // Clear job cache and live roles whenever the active scan changes
+  useEffect(() => {
+    setCachedJobs([]);
+    setLiveRoles([]);
+  }, [selectedScan?.id]);
+
   // Determine what data to show:
   // navData takes priority for display but selectedScan controls the analysis shown
   const data: Analysis | undefined = selectedScan

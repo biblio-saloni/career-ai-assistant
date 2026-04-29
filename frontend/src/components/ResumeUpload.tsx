@@ -5,6 +5,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { humanizeError } from "../utils/errorHelper";
 
 export default function ResumeUpload() {
   const navigate = useNavigate();
@@ -63,13 +64,7 @@ export default function ResumeUpload() {
         state: { analysis: data.analysis, extractedText: data.extractedText },
       });
     } catch (err: any) {
-      if (err.message?.includes("Failed to fetch")) {
-        setError(
-          "Cannot reach the server. Make sure your backend is running on port 8080.",
-        );
-      } else {
-        setError(err.message || "Failed to analyze resume. Please try again.");
-      }
+      setError(humanizeError(err));
     } finally {
       setAnalyzing(false);
     }

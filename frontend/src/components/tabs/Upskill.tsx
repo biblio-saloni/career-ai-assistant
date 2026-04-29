@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Analysis } from "../../pages/Dashboard";
+import { humanizeError } from "../../utils/errorHelper";
 
 interface Props {
   data: Analysis;
@@ -46,7 +47,7 @@ export function Upskill({ data, extractedText }: Props) {
       const json = await response.json();
       setImprovedText(json.improvedText);
     } catch (err: any) {
-      setError(err.message || "Failed to generate improved resume.");
+      setError(humanizeError(err));
     } finally {
       setImproving(false);
     }

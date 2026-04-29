@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { humanizeError } from "../../utils/errorHelper";
 import type { Analysis } from "../../pages/Dashboard";
 
 interface Props {
@@ -44,8 +45,10 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
   }, []);
 
   // Build a search query from the user's actual resume skills — top 3 skills + "developer India"
-  const topSkills = data.skills.slice(0, 3).join(" ");
-  const roleQuery = `${topSkills} developer India`;
+  // Use recommended_roles as search terms — much better job search signal than raw skills
+  // e.g. "SAP UI5 Developer" or "Frontend Developer" → searches exactly what's on job boards
+  const primaryRole = data.recommended_roles[0] ?? data.skills.slice(0, 2).join(" ") + " developer";
+  const roleQuery = `${primaryRole} India`;
   const skillsList = data.skills.join(", ");
   const expLevel = data.experience_level;
 
@@ -68,7 +71,7 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
 
     try {
       // ── STEP 1: Fetch real jobs from JSearch using resume skills ──
-      setStage(`🔍 Fetching live listings for: ${topSkills}...`);
+      setStage(`🔍 Fetching live listings for: ${primaryRole}...`);
 
       const jsRes = await fetch(
         `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(roleQuery)}&num_pages=2&date_posted=month&employment_types=FULLTIME`,
@@ -203,7 +206,7 @@ JSON shape per object: { index, title, company, location, type, match, skills, d
       if (onJobsCached) onJobsCached(scored);
       setJobs(scored);
     } catch (err: any) {
-      setError(err.message || "Something went wrong. Try refreshing.");
+      setError(humanizeError(err));
     } finally {
       setLoading(false);
       setStage("");
