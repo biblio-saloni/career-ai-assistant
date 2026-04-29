@@ -5,7 +5,6 @@ import { Jobs } from "../components/tabs/Jobs";
 import { SkillGaps } from "../components/tabs/SkillGaps";
 import { Market } from "../components/tabs/Market";
 import { Upskill } from "../components/tabs/Upskill";
-import { Overview } from "../components/tabs/Overview";
 import { supabase } from "../lib/supabaseClient";
 
 export interface Analysis {
@@ -31,7 +30,7 @@ interface ScanRecord {
   missing_keywords: string[];
 }
 
-type Tab = "overview" | "jobs" | "skills" | "upskill" | "market";
+type Tab = "jobs" | "skills" | "upskill" | "market";
 
 function toAnalysis(scan: ScanRecord): Analysis {
   return {
@@ -51,10 +50,11 @@ export default function Dashboard() {
   const navFileName = location.state?.fileName as string | undefined;
   const navExtractedText = location.state?.extractedText as string | undefined;
   const [extractedText] = useState<string>(navExtractedText ?? "");
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [activeTab, setActiveTab] = useState<Tab>("jobs");
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [selectedScan, setSelectedScan] = useState<ScanRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [liveRoles, setLiveRoles] = useState<string[]>([]);
 
   // Always fetch all scans on mount
   useEffect(() => {
@@ -154,7 +154,7 @@ export default function Dashboard() {
                         <span>Skills Found</span>
                       </div>
                       <div className="metric-item">
-                        <strong>{data.recommended_roles.length}</strong>
+                        <strong>{liveRoles.length > 0 ? liveRoles.length : data.recommended_roles.length}</strong>
                         <span>Matching Roles</span>
                       </div>
                       <div className="metric-item">
@@ -176,9 +176,14 @@ export default function Dashboard() {
                   </div>
 
                   <div className="card">
-                    <h3 className="card-title">Recommended Roles</h3>
+                    <h3 className="card-title">
+                      Matching Roles
+                      {liveRoles.length > 0 && (
+                        <span style={{ fontSize: "0.68rem", color: "#16a34a", fontWeight: 400, marginLeft: "8px" }}>● Live</span>
+                      )}
+                    </h3>
                     <div className="recommend-list">
-                      {data.recommended_roles.map((role, i) => (
+                      {(liveRoles.length > 0 ? liveRoles : data.recommended_roles).map((role, i) => (
                         <div key={i} className="recommend-item">
                           {i + 1}. {role}
                         </div>
@@ -189,12 +194,6 @@ export default function Dashboard() {
 
                 <main className="dashboard-main">
                   <div className="tab-container">
-                    <button
-                      onClick={() => setActiveTab("overview")}
-                      className={`tab ${activeTab === "overview" ? "tab-active" : ""}`}
-                    >
-                      Overview
-                    </button>
                     <button
                       onClick={() => setActiveTab("jobs")}
                       className={`tab ${activeTab === "jobs" ? "tab-active" : ""}`}
@@ -222,8 +221,7 @@ export default function Dashboard() {
                   </div>
 
                   <div className="card dashboard-content">
-                    {activeTab === "overview" && <Overview data={data} />}
-                    {activeTab === "jobs" && <Jobs data={data} />}
+                    {activeTab === "jobs" && <Jobs data={data} onRolesLoaded={setLiveRoles} />}
                     {activeTab === "skills" && <SkillGaps data={data} />}
                     {activeTab === "upskill" && (
                       <Upskill data={data} extractedText={extractedText} />

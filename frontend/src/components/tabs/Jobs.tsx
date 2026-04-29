@@ -3,6 +3,7 @@ import type { Analysis } from "../../pages/Dashboard";
 
 interface Props {
   data: Analysis;
+  onRolesLoaded?: (roles: string[]) => void;
 }
 
 interface ScoredJob {
@@ -22,7 +23,7 @@ interface ScoredJob {
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
 const RAPID_API_KEY = import.meta.env.VITE_RAPID_API_KEY || "";
 
-export function Jobs({ data }: Props) {
+export function Jobs({ data, onRolesLoaded }: Props) {
   const [jobs, setJobs] = useState<ScoredJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [stage, setStage] = useState<string>("🔍 Searching live job listings...");
@@ -171,6 +172,22 @@ JSON shape per object: { index, title, company, location, type, match, skills, d
         })
       );
 
+      // Clean and deduplicate job titles for sidebar
+      // Strip trailing codes like "IRC289227", long suffixes, and keep the core role title
+      const cleanedTitles = Array.from(
+        new Set(
+          scored.map((j: ScoredJob) =>
+            j.title
+              .replace(/\s*[-–|].*$/, "")          // strip "- ReactJS, Redux..." suffixes
+              .replace(/\s*\((?!react|vue|node)[^)]+\)/gi, "") // strip "(NestJS)" but keep "(React)"
+              .replace(/\s+IRC\d+$/i, "")           // strip trailing job codes like IRC289227
+              .replace(/\s+[A-Z]{2,}\d+$/i, "")    // strip other code patterns
+              .trim()
+          )
+        )
+      ).filter(Boolean);
+
+      if (onRolesLoaded) onRolesLoaded(cleanedTitles);
       setJobs(scored);
     } catch (err: any) {
       setError(err.message || "Something went wrong. Try refreshing.");
