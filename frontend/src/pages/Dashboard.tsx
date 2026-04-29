@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [selectedScan, setSelectedScan] = useState<ScanRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveRoles, setLiveRoles] = useState<string[]>([]);
+  const [cachedJobs, setCachedJobs] = useState<any[]>([]);
 
   // Always fetch all scans on mount
   useEffect(() => {
@@ -221,7 +222,7 @@ export default function Dashboard() {
                   </div>
 
                   <div className="card dashboard-content">
-                    {activeTab === "jobs" && <Jobs data={data} onRolesLoaded={setLiveRoles} />}
+                    {activeTab === "jobs" && <Jobs data={data} onRolesLoaded={setLiveRoles} cachedJobs={cachedJobs} onJobsCached={setCachedJobs} />}
                     {activeTab === "skills" && <SkillGaps data={data} />}
                     {activeTab === "upskill" && (
                       <Upskill data={data} extractedText={extractedText} />

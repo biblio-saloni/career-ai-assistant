@@ -4,6 +4,8 @@ import type { Analysis } from "../../pages/Dashboard";
 interface Props {
   data: Analysis;
   onRolesLoaded?: (roles: string[]) => void;
+  cachedJobs?: ScoredJob[];
+  onJobsCached?: (jobs: ScoredJob[]) => void;
 }
 
 interface ScoredJob {
@@ -23,13 +25,23 @@ interface ScoredJob {
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
 const RAPID_API_KEY = import.meta.env.VITE_RAPID_API_KEY || "";
 
-export function Jobs({ data, onRolesLoaded }: Props) {
-  const [jobs, setJobs] = useState<ScoredJob[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [stage, setStage] = useState<string>("🔍 Searching live job listings...");
+export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
+  const [jobs, setJobs] = useState<ScoredJob[]>(cachedJobs ?? []);
+  const [loading, setLoading] = useState((cachedJobs ?? []).length === 0);
+  const [stage, setStage] = useState<string>((cachedJobs ?? []).length === 0 ? "🔍 Searching live job listings..." : "");
   const [error, setError] = useState<string | null>(null);
   const [openMsg, setOpenMsg] = useState<number | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
+
+  // Restore roles if returning to tab with cached jobs
+  useEffect(() => {
+    if (cachedJobs && cachedJobs.length > 0 && onRolesLoaded) {
+      const titles = Array.from(new Set(cachedJobs.map(j =>
+        j.title.replace(/\s*[-–|].*$/, "").replace(/\s+IRC\d+$/i, "").trim()
+      ))).filter(Boolean);
+      onRolesLoaded(titles);
+    }
+  }, []);
 
   // Build a search query from the user's actual resume skills — top 3 skills + "developer India"
   const topSkills = data.skills.slice(0, 3).join(" ");
@@ -188,6 +200,7 @@ JSON shape per object: { index, title, company, location, type, match, skills, d
       ).filter(Boolean);
 
       if (onRolesLoaded) onRolesLoaded(cleanedTitles);
+      if (onJobsCached) onJobsCached(scored);
       setJobs(scored);
     } catch (err: any) {
       setError(err.message || "Something went wrong. Try refreshing.");
@@ -197,9 +210,11 @@ JSON shape per object: { index, title, company, location, type, match, skills, d
     }
   };
 
-  // Auto-fetch on mount
+  // Auto-fetch only if no cached results
   useEffect(() => {
-    fetchJobs();
+    if (!cachedJobs || cachedJobs.length === 0) {
+      fetchJobs();
+    }
   }, []);
 
   const highMatch = jobs.filter((j) => j.match >= 70).length;
