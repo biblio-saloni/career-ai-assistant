@@ -71,8 +71,11 @@ export default function Dashboard() {
       .then(({ data: rows, error }: any) => {
         if (!error && rows && rows.length > 0) {
           setScans(rows);
-          // If we came from upload, find that scan (most recent) as selected
-          setSelectedScan(rows[0]);
+          // Only auto-select a scan from history if there's no fresh navData
+          // (i.e., user navigated directly to /dashboard, not from a fresh upload)
+          if (!navData) {
+            setSelectedScan(rows[0]);
+          }
         }
         setLoading(false);
       });
@@ -84,11 +87,11 @@ export default function Dashboard() {
     setLiveRoles([]);
   }, [selectedScan?.id]);
 
-  // Determine what data to show:
-  // navData takes priority for display but selectedScan controls the analysis shown
-  const data: Analysis | undefined = selectedScan
-    ? toAnalysis(selectedScan)
-    : navData;
+  // selectedScan is only set when:
+  // 1) User navigated directly to dashboard (no fresh upload) → auto-set to rows[0]
+  // 2) User explicitly clicked a scan in the history panel
+  // When navData exists (fresh upload) selectedScan stays null → data = navData (the new resume)
+  const data: Analysis | undefined = selectedScan ? toAnalysis(selectedScan) : navData;
 
   const fileName = selectedScan?.file_name ?? navFileName ?? "Your resume";
 
