@@ -918,6 +918,13 @@ body {
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 24px;
+  flex: 1;
+}
+
+.dashboard-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
 }
 
 .dashboard-sidebar {
@@ -927,6 +934,8 @@ body {
 }
 
 .scan-history-panel {
+  width: 240px;
+  min-width: 240px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1061,14 +1070,72 @@ body {
   font-size: 14px;
 }
 
-.card-title {
-  font-weight: 600;
-  font-size: 16px;
+/* ========================
+   SIDEBAR COMPONENTS
+======================== */
+.metric-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
 }
 
-.text-muted {
-  color: #6b7280;
+.metric-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-align: center;
+  padding: 12px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.metric-item strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: #22d3ee;
+}
+
+.metric-item span {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.skill-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.skill-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  color: #22d3ee;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.recommend-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommend-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 14px;
   font-size: 14px;
+  color: #e2e8f0;
+  font-weight: 500;
 }
 
 /* ========================

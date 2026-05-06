@@ -63,7 +63,7 @@ function AtsGauge({ score }: { score: number }) {
 
 export function Market({ data }: Props) {
   const keywords = data.missing_keywords ?? [];
-  const improvements = data.improvements ?? [];
+  // const improvements = data.improvements ?? [];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -131,7 +131,7 @@ export function Market({ data }: Props) {
         </div>
       </div>
 
-      {/* Actionable Improvements */}
+      {/* Actionable Improvements
       <div style={{
         background: "rgba(255,255,255,0.03)",
         border: "1px solid rgba(34,211,238,0.15)",
@@ -160,7 +160,7 @@ export function Market({ data }: Props) {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
