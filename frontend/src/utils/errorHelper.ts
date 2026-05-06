@@ -5,8 +5,8 @@ export function humanizeError(error: string | Error): string {
   const msg = typeof error === "string" ? error : error.message;
 
   // Rate limits (Groq, JSearch, etc)
-  if (msg.includes("429") || msg.toLowerCase().includes("too many requests")) {
-    return "The AI is currently receiving a high volume of requests. Please wait about 30 seconds and try again.";
+  if (msg.includes("429") || msg.toLowerCase().includes("too many requests") || msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("rate_limit_exceeded")) {
+    return "The AI is currently receiving a high volume of requests. Please wait a moment and try again.";
   }
 
   // Auth / API Keys
