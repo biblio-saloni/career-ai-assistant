@@ -8,8 +8,8 @@ export function humanizeError(error: string | Error): string {
   if (msg.includes("429") || msg.toLowerCase().includes("too many requests") || msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("rate_limit_exceeded")) {
     const timeMatch = msg.match(/try again in ([0-9hms\.]+)/i);
     if (timeMatch && timeMatch[1]) {
-      // Clean up the time (e.g. "1h8m3.264s" -> "1h 8m")
-      const cleanTime = timeMatch[1].split('.')[0].replace(/([hms])/g, '$1 ').trim();
+      // Clean up the time (e.g. "1h8m3.264s" -> "1h 8m 3s")
+      const cleanTime = timeMatch[1].replace(/\.\d+/g, '').replace(/([hms])/g, '$1 ').trim();
       return `The AI has reached its limit. Please try again in ${cleanTime}.`;
     }
     return "The AI is currently receiving a high volume of requests. Please wait a moment and try again.";
