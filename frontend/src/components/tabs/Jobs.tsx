@@ -9,7 +9,7 @@ interface Props {
   onJobsCached?: (jobs: ScoredJob[]) => void;
 }
 
-interface ScoredJob {
+export interface ScoredJob {
   index: number;
   title: string;
   company: string;
@@ -39,6 +39,7 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
       ))).filter(Boolean);
       onRolesLoaded(titles);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Build a search query from the user's actual resume skills — top 3 skills + "developer India"
@@ -71,8 +72,8 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         throw new Error(
-          (errData as any).details ||
-            (errData as any).error ||
+          (errData as { details?: string }).details ||
+            (errData as { error?: string }).error ||
             `Server error ${response.status}`
         );
       }
@@ -101,7 +102,7 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
       if (onRolesLoaded) onRolesLoaded(cleanedTitles);
       if (onJobsCached) onJobsCached(scored);
       setJobs(scored);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(humanizeError(err));
     } finally {
       setLoading(false);
@@ -114,6 +115,7 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
     if (!cachedJobs || cachedJobs.length === 0) {
       fetchJobs();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const highMatch = jobs.filter((j) => j.match >= 70).length;

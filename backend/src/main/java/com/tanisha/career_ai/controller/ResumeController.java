@@ -29,8 +29,7 @@ public class ResumeController {
     private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
             "application/pdf",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/msword"
-    );
+            "application/msword");
 
     private final ResumeService resumeService;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -59,23 +58,20 @@ public class ResumeController {
         } catch (InvalidResumeFormatException e) {
             logger.warn("Invalid resume format from user={}: {}", userId, e.getMessage());
             return ResponseEntity.badRequest().body(
-                    new ErrorResponse("INVALID_FORMAT", e.getMessage())
-            );
+                    new ErrorResponse("INVALID_FORMAT", e.getMessage()));
         } catch (LlmServiceException e) {
             logger.error("LLM service error for user={}", userId, e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
-                    new ErrorResponse("LLM_ERROR", "AI service temporarily unavailable. Please try again in a moment.")
-            );
+                    new ErrorResponse("LLM_ERROR",
+                            "AI service temporarily unavailable. Please try again in a moment."));
         } catch (DatabaseException e) {
             logger.error("Database error for user={}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponse("DB_ERROR", "Could not save analysis. Please contact support.")
-            );
+                    new ErrorResponse("DB_ERROR", "Could not save analysis. Please contact support."));
         } catch (Exception e) {
             logger.error("Unexpected error during resume analysis for user={}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponse("INTERNAL_ERROR", "An unexpected error occurred. Please try again later.")
-            );
+                    new ErrorResponse("INTERNAL_ERROR", "An unexpected error occurred. Please try again later."));
         }
     }
 
@@ -90,15 +86,17 @@ public class ResumeController {
         try {
             if (resumeText == null || resumeText.isBlank()) {
                 return ResponseEntity.badRequest().body(
-                        new ErrorResponse("INVALID_INPUT", "Resume text is required")
-                );
+                        new ErrorResponse("INVALID_INPUT", "Resume text is required"));
             }
 
             ResumeImproveRequest request = new ResumeImproveRequest();
             request.setResumeText(resumeText);
-            request.setImprovements(objectMapper.readValue(improvementsJson, new TypeReference<List<String>>() {}));
-            request.setMissingKeywords(objectMapper.readValue(missingKeywordsJson, new TypeReference<List<String>>() {}));
-            request.setSkills(objectMapper.readValue(skillsJson, new TypeReference<List<String>>() {}));
+            request.setImprovements(objectMapper.readValue(improvementsJson, new TypeReference<List<String>>() {
+            }));
+            request.setMissingKeywords(objectMapper.readValue(missingKeywordsJson, new TypeReference<List<String>>() {
+            }));
+            request.setSkills(objectMapper.readValue(skillsJson, new TypeReference<List<String>>() {
+            }));
             request.setExperienceLevel(experienceLevel);
 
             String improvedText = resumeService.improveResume(request);
@@ -107,13 +105,11 @@ public class ResumeController {
         } catch (LlmServiceException e) {
             logger.error("LLM service error during resume improvement", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
-                    new ErrorResponse("LLM_ERROR", "AI service temporarily unavailable. Please try again.")
-            );
+                    new ErrorResponse("LLM_ERROR", "AI service temporarily unavailable. Please try again."));
         } catch (Exception e) {
             logger.error("Error during resume improvement", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponse("INTERNAL_ERROR", "Error processing resume improvement. Please try again.")
-            );
+                    new ErrorResponse("INTERNAL_ERROR", "Error processing resume improvement. Please try again."));
         }
     }
 
@@ -124,19 +120,18 @@ public class ResumeController {
 
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new InvalidResumeFormatException(
-                    String.format("File size %.1f MB exceeds maximum of 10MB", file.getSize() / 1_000_000.0)
-            );
+                    String.format("File size %.1f MB exceeds maximum of 10MB", file.getSize() / 1_000_000.0));
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new InvalidResumeFormatException(
-                    "Only PDF and DOCX files are supported. Received: " + contentType
-            );
+                    "Only PDF and DOCX files are supported. Received: " + contentType);
         }
 
         String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null || (!originalFilename.endsWith(".pdf") && !originalFilename.endsWith(".docx") && !originalFilename.endsWith(".doc"))) {
+        if (originalFilename == null || (!originalFilename.endsWith(".pdf") && !originalFilename.endsWith(".docx")
+                && !originalFilename.endsWith(".doc"))) {
             throw new InvalidResumeFormatException("Invalid file extension. Only .pdf and .docx are allowed");
         }
     }
@@ -161,16 +156,6 @@ public class ResumeController {
 
         if (fileName.length() > 255) {
             throw new InvalidResumeFormatException("File name must be under 255 characters");
-        }
-    }
-}
-            request.setExperienceLevel(experienceLevel);
-
-            String improvedText = resumeService.improveResume(request);
-            return ResponseEntity.ok(java.util.Map.of("improvedText", improvedText));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error during improvement: " + e.getMessage());
         }
     }
 }

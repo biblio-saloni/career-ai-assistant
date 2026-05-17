@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import { ErrorBoundary } from "../components/ErrorBoundary";
-import { Jobs } from "../components/tabs/Jobs";
+import { Jobs, type ScoredJob } from "../components/tabs/Jobs";
 import { SkillGaps } from "../components/tabs/SkillGaps";
 import { Market } from "../components/tabs/Market";
 import { Upskill } from "../components/tabs/Upskill";
 import { supabase } from "../lib/supabaseClient";
-import { validateAnalysis, Analysis } from "../types/analysisValidator";
+import { validateAnalysis, type Analysis } from "../types/analysisValidator";
 
 interface ScanRecord {
   id: string;
@@ -44,7 +44,7 @@ export default function Dashboard() {
   try {
     const rawNavData = location.state?.analysis;
     navData = rawNavData ? validateAnalysis(rawNavData) : undefined;
-  } catch (e) {
+  } catch {
     navData = undefined;
   }
 
@@ -56,7 +56,7 @@ export default function Dashboard() {
   const [selectedScan, setSelectedScan] = useState<ScanRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveRoles, setLiveRoles] = useState<string[]>([]);
-  const [cachedJobs, setCachedJobs] = useState<any[]>([]);
+  const [cachedJobs, setCachedJobs] = useState<ScoredJob[]>([]);
 
   // Always fetch all scans on mount
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function Dashboard() {
       .from("resume_scans")
       .select("*")
       .order("created_at", { ascending: false })
-      .then(({ data: rows, error }: any) => {
+      .then(({ data: rows, error }: { data: ScanRecord[] | null, error: unknown }) => {
         if (!error && rows && rows.length > 0) {
           setScans(rows);
           // Only auto-select a scan from history if there's no fresh navData
@@ -80,6 +80,7 @@ export default function Dashboard() {
         }
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Clear job cache and live roles whenever the active scan changes

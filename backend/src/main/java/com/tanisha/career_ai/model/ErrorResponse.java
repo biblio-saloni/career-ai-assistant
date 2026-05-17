@@ -1,6 +1,6 @@
 package com.tanisha.career_ai.model;
 
-import java.util.Map;
+// import java.util.Map;
 
 public class ErrorResponse {
     private String error;
