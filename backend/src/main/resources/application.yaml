@@ -13,22 +13,17 @@ logging:
   level:
     root: INFO
     com.tanisha.career_ai: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/career-ai.log
 
 groq:
   api:
-    key: ${GROQ_API_KEY}
+    key: ${GROQ_API_KEY:}
 
 rapid:
   api:
-    key: ${RAPID_API_KEY}
+    key: ${RAPID_API_KEY:}
 supabase:
   url: https://aktgmluowkkzdedyuiev.supabase.co
-  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
 oauth:
   google:
     client-id: ${GOOGLE_CLIENT_ID:}
