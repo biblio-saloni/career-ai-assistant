@@ -23,9 +23,6 @@ interface ScoredJob {
   applyUrl: string;
 }
 
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
-const RAPID_API_KEY = import.meta.env.VITE_RAPID_API_KEY || "";
-
 export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
   const [jobs, setJobs] = useState<ScoredJob[]>(cachedJobs ?? []);
   const [loading, setLoading] = useState((cachedJobs ?? []).length === 0);
@@ -57,146 +54,45 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
     setJobs([]);
     setError(null);
 
-    if (!RAPID_API_KEY) {
-      setError("RapidAPI key missing. Add VITE_RAPID_API_KEY to your .env file.");
-      setLoading(false);
-      return;
-    }
-
-    if (!GROQ_API_KEY) {
-      setError("Groq API key missing. Add VITE_GROQ_API_KEY to your .env file.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      // ── STEP 1: Fetch real jobs from JSearch using resume skills ──
-      setStage(`🔍 Fetching live listings for: ${primaryRole}...`);
+      setStage(`🔍 Searching live listings for: ${primaryRole}...`);
 
-      const jsRes = await fetch(
-        `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(roleQuery)}&num_pages=2&date_posted=month&employment_types=FULLTIME`,
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      
+      setStage(`🤖 Scoring matches...`);
+
+      const response = await fetch(
+        `${apiUrl}/api/jobs/score?roleQuery=${encodeURIComponent(roleQuery)}&skills=${encodeURIComponent(skillsList)}&expLevel=${encodeURIComponent(expLevel)}`,
         {
-          headers: {
-            "X-RapidAPI-Key": RAPID_API_KEY,
-            "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-          },
+          method: "POST",
         }
       );
 
-      if (!jsRes.ok) {
-        const errData = await jsRes.json().catch(() => ({}));
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
         throw new Error(
-          errData.message ||
-            `JSearch error ${jsRes.status}. Check your VITE_RAPID_API_KEY.`
+          (errData as any).details ||
+            (errData as any).error ||
+            `Server error ${response.status}`
         );
       }
 
-      const jsData = await jsRes.json();
-      const rawJobs = (jsData.data || []) as any[];
-      if (rawJobs.length === 0)
-        throw new Error("No live jobs found. Try again later.");
+      const data = await response.json();
+      const scored: ScoredJob[] = data.jobs || [];
 
-      // ── STEP 2: AI scoring via Groq ──
-      setStage(`🤖 Found ${rawJobs.length} listings. AI scoring matches...`);
-
-      const summaries = rawJobs
-        .map((j: any, i: number) => {
-          const loc =
-            [j.job_city, j.job_state, j.job_country]
-              .filter(Boolean)
-              .join(", ") || "India";
-          const desc = (j.job_description || "")
-            .replace(/\s+/g, " ")
-            .slice(0, 300);
-          return `[${i}] "${j.job_title}" at ${j.employer_name} (${loc}) — ${desc}`;
-        })
-        .join("\n\n");
-
-      const groqRes = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${GROQ_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            max_tokens: 4000,
-            temperature: 0.2,
-            messages: [
-              {
-                role: "system",
-                content: `You are a brutally honest job-fit evaluator. Score ALL provided jobs using this strict weighted formula:
-
-SCORING (compute "match" as weighted average):
-
-1. SKILL OVERLAP (50%):
-   - Candidate skills: ${skillsList}
-   - skill_score = (matched_required_skills / total_required_skills) * 100
-   - Only 1–2 skill matches out of 8+ required → skill_score ≤ 30
-
-2. EXPERIENCE FIT (35%):
-   - Candidate level: ${expLevel}
-   - Fresher/Junior (0–2 yrs): 0–3 yrs req → 100, 4–5 yrs → 50, 6+ → 10
-   - Mid-Level (2–4 yrs): 0–4 yrs req → 100, 5–6 yrs → 50, 7+ → 10
-   - Senior (4+ yrs): 0–6 yrs req → 100, 7+ → 70
-
-3. ROLE ALIGNMENT (15%):
-   - Exact match (same tech domain) → 100
-   - Partial (adjacent domain) → 60
-   - Mismatch (completely different stack) → 10
-
-FINAL match = round(skill_score*0.5 + exp_score*0.35 + role_score*0.15)
-
-RULES:
-- Never inflate. A poor match should score 30–55, not 80+.
-- difficulty: "easy" if match ≥ 75; "medium" if 55–74; "hard" if < 55
-- type: "product" if known product company; else "service"
-- skills: exactly 3 skills the candidate actually has that this job needs
-- insight: ONE honest sentence about fit AND gaps
-- Return ALL ${rawJobs.length} jobs sorted by match score descending.
-- Return ONLY a raw JSON array — no markdown, no explanation.
-
-JSON shape per object: { index, title, company, location, type, match, skills, difficulty, insight, recruiterTip }`,
-              },
-              {
-                role: "user",
-                content: `Score ALL ${rawJobs.length} jobs for this candidate and return exactly ${rawJobs.length} objects sorted by match:\n\n${summaries}`,
-              },
-            ],
-          }),
-        }
-      );
-
-      const groqData = await groqRes.json();
-      if (groqData.error) throw new Error("Groq: " + groqData.error.message);
-
-      const text = groqData.choices[0].message.content;
-      const s = text.indexOf("[");
-      const e = text.lastIndexOf("]");
-      if (s === -1 || e === -1) throw new Error("AI response parsing failed — try refreshing.");
-
-      const scored: ScoredJob[] = JSON.parse(text.slice(s, e + 1)).map(
-        (item: any) => ({
-          ...item,
-          applyUrl:
-            rawJobs[item.index]?.job_apply_link ||
-            rawJobs[item.index]?.job_google_link ||
-            "",
-        })
-      );
+      if (scored.length === 0) {
+        throw new Error("No jobs found. Try adjusting your search criteria.");
+      }
 
       // Clean and deduplicate job titles for sidebar
-      // Strip trailing codes like "IRC289227", long suffixes, and keep the core role title
       const cleanedTitles = Array.from(
         new Set(
           scored.map((j: ScoredJob) =>
             j.title
-              .replace(/\s*[-–|].*$/, "")          // strip "- ReactJS, Redux..." suffixes
-              .replace(/\s*\((?!react|vue|node)[^)]+\)/gi, "") // strip "(NestJS)" but keep "(React)"
-              .replace(/\s+IRC\d+$/i, "")           // strip trailing job codes like IRC289227
-              .replace(/\s+[A-Z]{2,}\d+$/i, "")    // strip other code patterns
+              .replace(/\s*[-–|].*$/, "")
+              .replace(/\s*\((?!react|vue|node)[^)]+\)/gi, "")
+              .replace(/\s+IRC\d+$/i, "")
+              .replace(/\s+[A-Z]{2,}\d+$/i, "")
               .trim()
           )
         )

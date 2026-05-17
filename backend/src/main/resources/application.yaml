@@ -5,8 +5,27 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
 server:
   port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    com.tanisha.career_ai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/career-ai.log
+
+groq:
+  api:
+    key: ${GROQ_API_KEY}
+
+rapid:
+  api:
+    key: ${RAPID_API_KEY}
 groq:
   api:
     key: ${GROQ_API_KEY}

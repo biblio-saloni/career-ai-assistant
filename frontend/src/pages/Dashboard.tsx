@@ -1,21 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../components/Header";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { Jobs } from "../components/tabs/Jobs";
 import { SkillGaps } from "../components/tabs/SkillGaps";
 import { Market } from "../components/tabs/Market";
 import { Upskill } from "../components/tabs/Upskill";
 import { supabase } from "../lib/supabaseClient";
-
-export interface Analysis {
-  skills: string[];
-  recommended_roles: string[];
-  experience_level: string;
-  skill_gaps: { skill: string; domain: string }[];
-  ats_score: number;
-  improvements: string[];
-  missing_keywords: string[];
-}
+import { validateAnalysis, Analysis } from "../types/analysisValidator";
 
 interface ScanRecord {
   id: string;
@@ -46,7 +38,16 @@ function toAnalysis(scan: ScanRecord): Analysis {
 
 export default function Dashboard() {
   const location = useLocation();
-  const navData = location.state?.analysis as Analysis | undefined;
+  
+  // Validate nav data with error handling
+  let navData: Analysis | undefined;
+  try {
+    const rawNavData = location.state?.analysis;
+    navData = rawNavData ? validateAnalysis(rawNavData) : undefined;
+  } catch (e) {
+    navData = undefined;
+  }
+
   const navFileName = location.state?.fileName as string | undefined;
   const navExtractedText = location.state?.extractedText as string | undefined;
   const [extractedText] = useState<string>(navExtractedText ?? "");
@@ -231,12 +232,20 @@ export default function Dashboard() {
                   </div>
 
                   <div className="card dashboard-content">
-                    {activeTab === "jobs" && <Jobs data={data} onRolesLoaded={setLiveRoles} cachedJobs={cachedJobs} onJobsCached={setCachedJobs} />}
-                    {activeTab === "skills" && <SkillGaps data={data} />}
-                    {activeTab === "upskill" && (
-                      <Upskill data={data} extractedText={extractedText} />
-                    )}
-                    {activeTab === "market" && <Market data={data} />}
+                    <ErrorBoundary>
+                      {activeTab === "jobs" && <Jobs data={data} onRolesLoaded={setLiveRoles} cachedJobs={cachedJobs} onJobsCached={setCachedJobs} />}
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      {activeTab === "skills" && <SkillGaps data={data} />}
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      {activeTab === "upskill" && (
+                        <Upskill data={data} extractedText={extractedText} />
+                      )}
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                      {activeTab === "market" && <Market data={data} />}
+                    </ErrorBoundary>
                   </div>
                 </main>
               </div>
