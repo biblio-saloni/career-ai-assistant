@@ -160,15 +160,22 @@ public class JobScoringService {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < rawJobs.size(); i++) {
             Map<String, Object> job = rawJobs.get(i);
-            String title = (String) job.getOrDefault("job_title", "Unknown");
-            String company = (String) job.getOrDefault("employer_name", "Unknown");
-            String description = (String) job.getOrDefault("job_description", "");
+            String title = (String) job.get("job_title");
+            if (title == null) title = "Unknown";
+            String company = (String) job.get("employer_name");
+            if (company == null) company = "Unknown";
+            String description = (String) job.get("job_description");
+            if (description == null) description = "";
             description = description.replaceAll("\\s+", " ").substring(0, Math.min(300, description.length()));
 
             List<String> locParts = new ArrayList<>();
-            String city = (String) job.getOrDefault("job_city", "");
-            String state = (String) job.getOrDefault("job_state", "");
-            String country = (String) job.getOrDefault("job_country", "");
+            String city = (String) job.get("job_city");
+            if (city == null) city = "";
+            String state = (String) job.get("job_state");
+            if (state == null) state = "";
+            String country = (String) job.get("job_country");
+            if (country == null) country = "";
+            
             if (!city.isEmpty())
                 locParts.add(city);
             if (!state.isEmpty())
@@ -256,8 +263,15 @@ public class JobScoringService {
                 int index = ((Number) item.get("index")).intValue();
                 if (index < rawJobs.size()) {
                     Map<String, Object> rawJob = rawJobs.get(index);
-                    item.put("applyUrl", rawJob.getOrDefault("job_apply_link",
-                            rawJob.getOrDefault("job_google_link", "")));
+                    String applyLink = (String) rawJob.get("job_apply_link");
+                    String googleLink = (String) rawJob.get("job_google_link");
+                    String finalLink = "";
+                    if (applyLink != null && !applyLink.isBlank()) {
+                        finalLink = applyLink;
+                    } else if (googleLink != null && !googleLink.isBlank()) {
+                        finalLink = googleLink;
+                    }
+                    item.put("applyUrl", finalLink);
                     scored.add(item);
                 }
             }
