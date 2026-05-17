@@ -76,28 +76,13 @@ public class ResumeController {
     }
 
     @PostMapping("/improve")
-    public ResponseEntity<?> improveResume(
-            @RequestParam("resumeText") String resumeText,
-            @RequestParam("improvements") String improvementsJson,
-            @RequestParam("missingKeywords") String missingKeywordsJson,
-            @RequestParam("skills") String skillsJson,
-            @RequestParam("experienceLevel") String experienceLevel) {
+    public ResponseEntity<?> improveResume(@RequestBody ResumeImproveRequest request) {
 
         try {
-            if (resumeText == null || resumeText.isBlank()) {
+            if (request.getResumeText() == null || request.getResumeText().isBlank()) {
                 return ResponseEntity.badRequest().body(
                         new ErrorResponse("INVALID_INPUT", "Resume text is required"));
             }
-
-            ResumeImproveRequest request = new ResumeImproveRequest();
-            request.setResumeText(resumeText);
-            request.setImprovements(objectMapper.readValue(improvementsJson, new TypeReference<List<String>>() {
-            }));
-            request.setMissingKeywords(objectMapper.readValue(missingKeywordsJson, new TypeReference<List<String>>() {
-            }));
-            request.setSkills(objectMapper.readValue(skillsJson, new TypeReference<List<String>>() {
-            }));
-            request.setExperienceLevel(experienceLevel);
 
             String improvedText = resumeService.improveResume(request);
             return ResponseEntity.ok(Map.of("improvedText", improvedText));
