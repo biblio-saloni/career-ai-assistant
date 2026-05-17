@@ -51,7 +51,7 @@ public class JobScoringService {
         }
 
         // Step 2: Score jobs with Groq
-        List<Map<String, Object>> scoredJobs = scoreJobsWithGroq(rawJobs, skills, expLevel, apiKey);
+        List<Map<String, Object>> scoredJobs = scoreJobsWithGroq(rawJobs, skills, expLevel, apiKey, roleQuery);
 
         logger.info("Successfully scored {} jobs", scoredJobs.size());
         return scoredJobs;
@@ -113,12 +113,13 @@ public class JobScoringService {
             List<Map<String, Object>> rawJobs,
             String skills,
             String expLevel,
-            String apiKey) throws LlmServiceException {
+            String apiKey,
+            String roleQuery) throws LlmServiceException {
 
         try {
             String jobSummaries = buildJobSummaries(rawJobs);
 
-            String systemPrompt = buildGroqSystemPrompt(skills, expLevel, rawJobs.size());
+            String systemPrompt = buildGroqSystemPrompt(skills, expLevel, rawJobs.size(), roleQuery);
             String userPrompt = String.format(
                     "Score ALL %d jobs for this candidate and return exactly %d objects sorted by match:\n\n%s",
                     rawJobs.size(), rawJobs.size(), jobSummaries);
@@ -191,19 +192,19 @@ public class JobScoringService {
         return sb.toString();
     }
 
-    private String buildGroqSystemPrompt(String skills, String expLevel, int jobCount) {
+    private String buildGroqSystemPrompt(String skills, String expLevel, int jobCount, String roleQuery) {
         return String.format(
                 """
                         You are a brutally honest job-fit evaluator. Score ALL provided jobs using this strict weighted formula:
 
                         SCORING (compute "match" as weighted average):
 
-                        1. SKILL OVERLAP (50%%):
+                        1. SKILL OVERLAP (40%%):
                            - Candidate skills: %s
                            - skill_score = (matched_required_skills / total_required_skills) * 100
                            - Only 1–2 skill matches out of 8+ required → skill_score ≤ 30
 
-                        2. EXPERIENCE FIT (35%%):
+                        2. EXPERIENCE FIT (30%%):
                            - Candidate level: %s
                            - Fresher/Junior (0–2 yrs): 0–3 yrs req → 100, 4–5 yrs → 50, 6+ → 10
                            - Mid-Level (2–4 yrs): 0–4 yrs req → 100, 5–6 yrs → 50, 7+ → 10
@@ -213,21 +214,27 @@ public class JobScoringService {
                            - Exact match (same tech domain) → 100
                            - Partial (adjacent domain) → 60
                            - Mismatch (completely different stack) → 10
+                           
+                        4. LOCATION FIT (15%%):
+                           - Candidate's target search query: "%s"
+                           - If the job's location clearly mismatches the target location in the query (e.g., job is in US but query is India), location_score = 0 and cap the FINAL match score at 20.
+                           - If it matches or is a valid remote role for that region → 100.
 
-                        FINAL match = round(skill_score*0.5 + exp_score*0.35 + role_score*0.15)
+                        FINAL match = round(skill_score*0.4 + exp_score*0.3 + role_score*0.15 + location_score*0.15)
+                        *If location is a complete mismatch, do not let the final match exceed 20.*
 
                         RULES:
                         - Never inflate. A poor match should score 30–55, not 80+.
                         - difficulty: "easy" if match ≥ 75; "medium" if 55–74; "hard" if < 55
                         - type: "product" if known product company; else "service"
                         - skills: exactly 3 skills the candidate actually has that this job needs
-                        - insight: ONE honest sentence about fit AND gaps
+                        - insight: ONE honest sentence about fit AND gaps (mention location mismatch if applicable)
                         - recruiterTip: Brief actionable advice
                         - Return ALL %d jobs sorted by match score descending.
                         - Return ONLY a raw JSON array — no markdown, no explanation.
 
                         JSON shape per object: { index, title, company, location, type, match, skills, difficulty, insight, recruiterTip }""",
-                skills, expLevel, jobCount);
+                skills, expLevel, roleQuery, jobCount);
     }
 
     private List<Map<String, Object>> parseGroqScoredJobs(String response, List<Map<String, Object>> rawJobs)
