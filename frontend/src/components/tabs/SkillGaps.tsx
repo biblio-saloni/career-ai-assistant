@@ -1,4 +1,4 @@
-import type { Analysis } from "../../pages/Dashboard";
+import type { Analysis } from "../../types/analysis";
 
 interface Props { data: Analysis; }
 
@@ -32,7 +32,7 @@ export function SkillGaps({ data }: Props) {
 
       {/* Gap cards grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "12px" }}>
-        {gaps.map((gap, i) => {
+        {gaps.map((gap: { skill: string; domain: string }, i: number) => {
           const meta = getDomainMeta(gap.domain);
           return (
             <div

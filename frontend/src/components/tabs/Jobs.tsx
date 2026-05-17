@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { humanizeError } from "../../utils/errorHelper";
-import type { Analysis } from "../../pages/Dashboard";
+import type { Analysis } from "../../types/analysis";
 
 interface Props {
   data: Analysis;
@@ -103,7 +103,7 @@ export function Jobs({ data, onRolesLoaded, cachedJobs, onJobsCached }: Props) {
       if (onJobsCached) onJobsCached(scored);
       setJobs(scored);
     } catch (err: unknown) {
-      setError(humanizeError(err));
+      setError(humanizeError(err as Error));
     } finally {
       setLoading(false);
       setStage("");

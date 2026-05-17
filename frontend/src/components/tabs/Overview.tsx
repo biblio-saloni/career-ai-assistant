@@ -1,4 +1,4 @@
-import type { Analysis } from "../../pages/Dashboard";
+import type { Analysis } from "../../types/analysis";
 
 interface Props {
   data: Analysis;
@@ -29,7 +29,7 @@ export function Overview({ data }: Props) {
         <h3 className="card-title">Skills</h3>
 
         <div className="skill-chip-grid">
-          {data.skills.map((skill, i) => (
+          {data.skills.map((skill: string, i: number) => (
             <span key={i} className="badge badge-green">
               {skill}
             </span>
@@ -42,7 +42,7 @@ export function Overview({ data }: Props) {
         <h3 className="card-title">Recommended Roles</h3>
 
         <div className="section-list">
-          {data.recommended_roles.map((role, i) => (
+          {data.recommended_roles.map((role: string, i: number) => (
             <p key={i}>{role}</p>
           ))}
         </div>

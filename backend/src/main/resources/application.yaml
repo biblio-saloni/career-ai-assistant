@@ -26,9 +26,6 @@ groq:
 rapid:
   api:
     key: ${RAPID_API_KEY}
-groq:
-  api:
-    key: ${GROQ_API_KEY}
 supabase:
   url: https://aktgmluowkkzdedyuiev.supabase.co
   service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}

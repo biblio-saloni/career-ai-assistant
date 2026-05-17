@@ -1,4 +1,4 @@
-import type { Analysis } from "../../pages/Dashboard";
+import type { Analysis } from "../../types/analysis";
 
 interface Props { data: Analysis; }
 
@@ -115,7 +115,7 @@ export function Market({ data }: Props) {
           </span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {keywords.map((kw, i) => (
+          {keywords.map((kw: string, i: number) => (
             <span key={i} style={{
               fontSize: "0.8rem", padding: "5px 14px", borderRadius: "20px", fontWeight: 500,
               background: "rgba(248,113,113,0.08)", color: "#fca5a5",
