@@ -20,11 +20,16 @@ public class LlmService {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String groqModel;
 
-    public LlmService(@Value("${groq.api.key}") String apiKey) {
+    public LlmService(@Value("${groq.api.key}") String apiKey,
+                      @Value("${groq.api.model:openai/gpt-oss-120b}") String groqModel) {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalArgumentException("groq.api.key must be configured");
         }
+        this.groqModel = (groqModel == null || groqModel.isBlank())
+                ? "openai/gpt-oss-120b"
+                : groqModel.trim();
         this.webClient = WebClient.builder()
                 .baseUrl("https://api.groq.com/openai/v1")
                 .defaultHeader("Authorization", "Bearer " + apiKey)
@@ -107,7 +112,7 @@ public class LlmService {
         message.put("content", prompt);
 
         Map<String, Object> requestBody = new java.util.HashMap<>();
-        requestBody.put("model", "llama-3.3-70b-versatile");
+        requestBody.put("model", groqModel);
         requestBody.put("messages", List.of(message));
         requestBody.put("temperature", 0.0);
         requestBody.put("seed", 42);
@@ -256,7 +261,7 @@ public class LlmService {
         message.put("content", prompt);
 
         Map<String, Object> requestBody = new java.util.HashMap<>();
-        requestBody.put("model", "llama-3.3-70b-versatile");
+        requestBody.put("model", groqModel);
         requestBody.put("messages", List.of(message));
         requestBody.put("temperature", 0.2);
 

@@ -23,12 +23,17 @@ public class JobScoringService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String rapidApiKey;
     private final String groqApiKey;
+    private final String groqModel;
 
     public JobScoringService(
             @Value("${rapid.api.key:}") String rapidApiKey,
-            @Value("${groq.api.key}") String groqApiKey) {
+            @Value("${groq.api.key}") String groqApiKey,
+            @Value("${groq.api.model:openai/gpt-oss-120b}") String groqModel) {
         this.rapidApiKey = rapidApiKey;
         this.groqApiKey = groqApiKey;
+        this.groqModel = (groqModel == null || groqModel.isBlank())
+                ? "openai/gpt-oss-120b"
+                : groqModel.trim();
         this.webClient = WebClient.create();
     }
 
@@ -127,7 +132,7 @@ public class JobScoringService {
             logger.debug("Sending {} jobs to Groq for scoring", rawJobs.size());
 
             Map<String, Object> requestBody = Map.of(
-                    "model", "llama-3.3-70b-versatile",
+                    "model", groqModel,
                     "max_tokens", 4000,
                     "temperature", 0.2,
                     "messages", List.of(
